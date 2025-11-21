@@ -66,7 +66,7 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
         opacity: !isDayCardHalfTransparent && isDayCardTransparent ? '0.3 !important' : 1
       }"
     >
-      <div @click="handleShowMore" class="p-6">
+      <div @click="handleShowMore" class="p-6 cursor-pointer">
         <!-- Date Header -->
         <div
           class="flex justify-between"
@@ -77,13 +77,13 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
               <div
                 @click.stop="handleMarkAbsent(date)"
                 style="margin-top: 2px;"
-                class="w-6 h-6 p-1 mr-2"
+                class="w-6 h-6 p-1 mr-2 cursor-pointer hover:scale-110 active:scale-95 transition-transform"
               >
                 <!-- Absent icon -->
                 <svg
                   v-if="missingDates.map((md) => md.split(' [-] ')[0]).includes(date)"
                   title="Marquer ce jour comme non travaillé"
-                  class="text-red-300 h-full w-full"
+                  class="text-red-300 h-full w-full hover:text-red-200 transition-colors"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 640 512"
                 >
@@ -96,7 +96,7 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
                   v-else
                   title="Marquer ce jour comme travaillé"
                   xmlns="http://www.w3.org/2000/svg"
-                  class="text-indigo-300 h-full w-full"
+                  class="text-indigo-300 h-full w-full hover:text-indigo-200 transition-colors"
                   viewBox="0 0 640 512"
                 >
                   <path fill="currentColor"
