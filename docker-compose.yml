@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
-  web:
+  api:
     image: php:8.2-apache
     ports:
-      - "9876:80"
+      - "8080:80"
     volumes:
-      - .:/var/www/html
+      - ./api:/var/www/html
       - kelio_data:/tmp
     environment:
       - PHP_DISPLAY_ERRORS=1

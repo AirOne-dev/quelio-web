@@ -1,1 +1,17 @@
 .DS_Store
+node_modules
+dist
+dist-ssr
+.env
+*.local
+pnpm-lock.yaml
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
