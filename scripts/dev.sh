@@ -16,8 +16,8 @@ fi
 
 # Arrêter les conteneurs existants
 echo "🐳 Démarrage de l'API PHP..."
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose --profile dev up -d
 
 # Attendre que l'API soit prête
 echo "⏳ Attente du démarrage de l'API..."

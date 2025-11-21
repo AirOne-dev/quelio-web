@@ -11,12 +11,11 @@ fi
 
 # Arrêter les conteneurs existants
 echo "🛑 Stopping existing containers..."
-docker-compose -f docker-compose.prod.yml down 2>/dev/null
-docker-compose down 2>/dev/null
+docker compose down 2>/dev/null
 
 # Build l'image Docker
 echo "🏗️  Building Docker image..."
-docker-compose -f docker-compose.prod.yml build
+docker compose --profile prod build
 
 if [ $? -ne 0 ]; then
     echo "❌ Docker build failed!"
@@ -25,7 +24,7 @@ fi
 
 # Démarrer le conteneur de production
 echo "🐳 Starting production container..."
-docker-compose -f docker-compose.prod.yml up -d
+docker compose --profile prod up -d
 
 echo ""
 echo "✅ Production preview started!"
@@ -36,5 +35,5 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo "💡 This is a production build running in Docker"
 echo ""
-echo "To stop: docker-compose -f docker-compose.prod.yml down"
-echo "To view logs: docker-compose -f docker-compose.prod.yml logs -f"
+echo "To stop: docker compose --profile prod down"
+echo "To view logs: docker compose --profile prod logs -f"

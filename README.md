@@ -70,18 +70,9 @@ pnpm dev
 # Build de production
 pnpm build
 
-# Preview du build de production
+# Preview du build de production avec Docker
 pnpm preview
-
-# Démarrer la version de production (build + run)
-pnpm start:prod
 ```
-
-### Scripts dans le dossier `scripts/`
-
-- `dev.sh` : Lance l'environnement de développement complet
-- `build.sh` : Build l'application et copie l'API dans dist/
-- `start-prod.sh` : Lance la version de production avec Docker
 
 ## 🏗️ Build de production
 
@@ -106,43 +97,29 @@ dist/
 
 ## 🚀 Déploiement
 
-### Preview locale (avec Docker)
+### Preview locale
 
 ```bash
 pnpm preview
 ```
 
-Cela va :
-1. Builder l'image Docker depuis le `Dockerfile`
-2. Démarrer un conteneur avec l'application complète sur http://localhost:9876
-
-L'image Docker contient :
-- ✅ Apache + PHP 8.2 configuré
-- ✅ Extension cURL installée
-- ✅ Frontend compilé et optimisé
-- ✅ API PHP intégrée (avec sa propre configuration)
+Cela va builder l'image Docker et démarrer l'application complète sur http://localhost:9876
 
 ### Sur un serveur
 
-**Option 1 : Avec Docker (recommandé)**
+**Avec Docker :**
 
 ```bash
-# Sur le serveur
 pnpm install
 pnpm build
-docker-compose -f docker-compose.prod.yml up -d --build
+docker compose --profile prod up -d --build
 ```
 
-**Option 2 : Upload manuel**
+**Sans Docker :**
 
-1. Build l'application : `pnpm build`
-2. Uploadez le contenu du dossier `dist/` sur votre serveur web
-3. Assurez-vous que :
-   - PHP 8.2+ est installé avec l'extension cURL
-   - Apache a `mod_rewrite` activé
-   - Le fichier `api/config.php` est configuré avec vos credentials Kelio
-
-**Pour plus de détails sur Docker, consultez [DOCKER.md](./DOCKER.md)**
+1. Build : `pnpm build`
+2. Uploadez `dist/` sur votre serveur
+3. Configurez Apache/Nginx pour servir le dossier
 
 ## 📝 Fonctionnalités
 
