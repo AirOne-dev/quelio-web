@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  web:
+    image: php:8.2-apache
+    ports:
+      - "9876:80"
+    volumes:
+      - .:/var/www/html
+      - kelio_data:/tmp
+    environment:
+      - PHP_DISPLAY_ERRORS=1
+      - PHP_ERROR_REPORTING=E_ALL
+    restart: unless-stopped
+    command: >
+      bash -c "
+        apt-get update &&
+        apt-get install -y libcurl4-openssl-dev &&
+        docker-php-ext-install curl &&
+        echo 'display_errors = On' >> /usr/local/etc/php/conf.d/error_reporting.ini &&
+        echo 'error_reporting = E_ALL' >> /usr/local/etc/php/conf.d/error_reporting.ini &&
+        rm -rf /var/lib/apt/lists/* &&
+        apache2-foreground
+      "
+
+volumes:
+  kelio_data:
+    driver: local
