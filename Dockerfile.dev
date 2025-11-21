@@ -1,0 +1,23 @@
+FROM php:8.2-apache
+
+# Install cURL extension
+RUN apt-get update && \
+    apt-get install -y libcurl4-openssl-dev && \
+    docker-php-ext-install curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Enable Apache rewrite module
+RUN a2enmod rewrite
+
+# Configure PHP for development
+RUN echo 'display_errors = On' >> /usr/local/etc/php/conf.d/error_reporting.ini && \
+    echo 'error_reporting = E_ALL' >> /usr/local/etc/php/conf.d/error_reporting.ini
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start Apache
+CMD ["apache2-foreground"]

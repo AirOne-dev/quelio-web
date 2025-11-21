@@ -1,0 +1,45 @@
+export interface Credentials {
+  username: string
+  password: string
+}
+
+export interface TimeBlock {
+  start: string
+  end: string
+  duration: string
+}
+
+export interface ApiResponse {
+  hours: Record<string, string[]>
+  total_effective: string
+  total_paid: string
+  last_save: string
+  error?: string
+}
+
+export interface CustomBornes {
+  startMorning?: string
+  endMorning?: string
+  startAfternoon?: string
+  endAfternoon?: string
+}
+
+export type CustomBornesForSuggestions = Record<string, CustomBornes>
+
+export interface DefaultBornes {
+  startMorning: string
+  endMorning: string
+  startAfternoon: string
+  endAfternoon: string
+}
+
+export interface BornesTime {
+  typeHandler: 'startMorning' | 'endMorning' | 'startAfternoon' | 'endAfternoon' | undefined
+  minPosition: number
+  maxPosition: number
+}
+
+export interface LogEntry {
+  type: 'log' | 'warn' | 'error'
+  message: string
+}

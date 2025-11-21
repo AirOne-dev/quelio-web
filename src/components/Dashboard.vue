@@ -1,0 +1,177 @@
+<script setup lang="ts">
+import { toRef, onMounted } from 'vue'
+import DayCard from './DayCard.vue'
+import WeekStats from './WeekStats.vue'
+import OfflineBanner from './OfflineBanner.vue'
+import DebugConsole from './DebugConsole.vue'
+import SettingsModal from './SettingsModal.vue'
+import PresenceModal from './PresenceModal.vue'
+import { useLocalStorage } from '../composables/useLocalStorage'
+import { useAbsences } from '../composables/useAbsences'
+import { useWeekDays } from '../composables/useWeekDays'
+import { useTimeObjective } from '../composables/useTimeObjective'
+import { useDaysLeft } from '../composables/useDaysLeft'
+import { useSuggestions } from '../composables/useSuggestions'
+import { useModals } from '../composables/useModals'
+import type { ApiResponse, Credentials, LogEntry } from '../types'
+
+// Props
+interface Props {
+  data: ApiResponse
+  offline: boolean
+  credentials: Credentials
+  debugMode: boolean
+  logs: LogEntry[]
+}
+
+// Emits
+interface Emits {
+  (e: 'logout'): void
+  (e: 'refresh'): void
+  (e: 'update:debug-mode', value: boolean): void
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+// Convert props to refs
+const dataRef = toRef(() => props.data)
+
+// Composables
+const { saveLocalStorage, loadLocalStorage } = useLocalStorage(props.credentials.username)
+
+const {
+  missingDates,
+  markAbsent,
+  removeAbsent,
+  loadMissingDates,
+  isDayCardTransparent,
+  isDayCardHalfTransparent
+} = useAbsences(saveLocalStorage, loadLocalStorage)
+
+const { days } = useWeekDays(dataRef, missingDates, saveLocalStorage)
+
+const {
+  minutesObjective,
+  remainingMinutes,
+  changeHourObjective,
+  loadObjective
+} = useTimeObjective(dataRef, missingDates, toRef(() => null), saveLocalStorage, loadLocalStorage)
+
+const { daysLeft } = useDaysLeft(days, missingDates, remainingMinutes)
+
+const {
+  selectedSuggestedBlock,
+  suggestedTimeBlocks,
+  getCustomBorneForSuggestions,
+  startResizeSuggestion
+} = useSuggestions(days, daysLeft, remainingMinutes, saveLocalStorage, loadLocalStorage)
+
+const {
+  showSettingsModal,
+  showPresenceModal,
+  presenceDate,
+  toggleBottomModal,
+  togglePresenceModal,
+  handleMarkAbsent
+} = useModals()
+
+// Methods
+const showMore = (event: MouseEvent) => {
+  const parent = (event.target as HTMLElement).closest('.day-card')
+  const content = parent?.querySelector('.time-blocks') as HTMLElement
+
+  if (content && parent) {
+    if (content.style.height === '0px') {
+      const caretIcon = parent.querySelector('.caret-icon') as HTMLElement
+      if (caretIcon) caretIcon.style.transform = 'rotate(180deg)'
+      content.style.height = content.scrollHeight + 'px'
+    } else {
+      const caretIcon = parent.querySelector('.caret-icon') as HTMLElement
+      if (caretIcon) caretIcon.style.transform = 'rotate(0deg)'
+      content.style.height = '0px'
+    }
+  }
+}
+
+const changeDebugMode = (value: boolean) => {
+  emit('update:debug-mode', value)
+}
+
+const handleMarkAbsentAndClose = (date: string, section: 'day' | 'morning' | 'afternoon' = 'day') => {
+  markAbsent(date, section)
+  togglePresenceModal()
+}
+
+// Lifecycle hooks
+onMounted(() => {
+  getCustomBorneForSuggestions()
+  loadMissingDates()
+  loadObjective()
+
+  document.addEventListener('click', (event) => {
+    if (selectedSuggestedBlock.value && !(event.target as HTMLElement).closest('.suggestedBlock')) {
+      selectedSuggestedBlock.value = null
+    }
+  })
+})
+</script>
+
+<template>
+  <!-- Offline banner -->
+  <OfflineBanner :offline="offline" />
+
+  <div class="pb-40" :class="offline ? 'pt-24' : ''">
+    <!-- Header Stats -->
+    <WeekStats
+      :total-effective="data.total_effective"
+      :total-paid="data.total_paid"
+      :remaining-minutes="remainingMinutes"
+      @refresh="emit('refresh')"
+      @open-settings="toggleBottomModal"
+    />
+
+    <!-- Days -->
+    <div class="space-y-6 px-6 mt-44">
+      <DayCard
+        v-for="(times, date, index) in days"
+        :key="date"
+        :date="date"
+        :times="times"
+        :index="index"
+        :missing-dates="missingDates"
+        :suggested-time-blocks="suggestedTimeBlocks[date]"
+        :selected-suggested-block="selectedSuggestedBlock"
+        :is-day-card-half-transparent="isDayCardHalfTransparent(times, date)"
+        :is-day-card-transparent="isDayCardTransparent(times, date)"
+        @show-more="showMore"
+        @mark-absent="handleMarkAbsent"
+        @remove-absent="removeAbsent"
+        @update:selected-suggested-block="selectedSuggestedBlock = $event"
+        @start-resize-suggestion="startResizeSuggestion"
+      />
+    </div>
+
+    <!-- Debug Console -->
+    <DebugConsole :logs="logs" :debug-mode="debugMode" :username="credentials.username" />
+
+    <!-- Settings modal -->
+    <SettingsModal
+      :show="showSettingsModal"
+      :minutes-objective="minutesObjective"
+      :debug-mode="debugMode"
+      @close="toggleBottomModal"
+      @logout="emit('logout')"
+      @update:minutes-objective="changeHourObjective"
+      @update:debug-mode="changeDebugMode"
+    />
+
+    <!-- Mark absent modal -->
+    <PresenceModal
+      :show="showPresenceModal"
+      :presence-date="presenceDate"
+      @close="togglePresenceModal"
+      @mark-absent="handleMarkAbsentAndClose"
+    />
+  </div>
+</template>

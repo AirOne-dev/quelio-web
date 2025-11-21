@@ -1,0 +1,38 @@
+# Ignore everything except dist/
+*
+!dist/
+
+# But ignore these in dist/ too
+dist/node_modules
+dist/.git
+
+# Development files
+node_modules
+.git
+.gitignore
+*.md
+src
+public
+scripts
+*.sh
+
+# Config files
+vite.config.ts
+tsconfig.json
+tsconfig.node.json
+package.json
+pnpm-lock.yaml
+.node-version
+
+# Docker files
+docker-compose.yml
+docker-compose.prod.yml
+Dockerfile
+.dockerignore
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
