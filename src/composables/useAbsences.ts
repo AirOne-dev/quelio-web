@@ -1,12 +1,10 @@
 import { ref } from 'vue'
-import type { CustomBornesForSuggestions } from '../types'
 import { useTimeCalculations } from './useTimeCalculations'
 
 export function useAbsences(
   saveLocalStorage: (label: string, data: any) => void,
   loadLocalStorage: (label: string) => any
 ) {
-  const { getCurrentWeekDates } = useTimeCalculations()
 
   const missingDates = ref<string[]>([])
 
@@ -38,7 +36,7 @@ export function useAbsences(
     return !times && isPastDateOrWeekend(date) || missingDates.value.map((md) => md.split(' [-] ')[0]).includes(date)
   }
 
-  const isDayCardHalfTransparent = (times: string[] | undefined, date: string) => {
+  const isDayCardHalfTransparent = (_times: string[] | undefined, date: string) => {
     return missingDates.value.filter((md) => md.split(' [-] ').length === 2).map((md) => md.split(' [-] ')[0]).includes(date)
   }
 

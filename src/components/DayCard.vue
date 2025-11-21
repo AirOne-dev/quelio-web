@@ -28,7 +28,9 @@ const emit = defineEmits<Emits>()
 const { getTimeBlocks, getDayTotal, getBlockStyle } = useTimeCalculations()
 
 const formatDate = (date: string) => {
-  return moment(date, 'DD-MM-YYYY').format('dddd D MMMM')
+  const formatted = moment(date, 'DD-MM-YYYY').locale('fr').format('dddd D MMMM')
+  // Capitalize first letter
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1)
 }
 
 const handleShowMore = (event: MouseEvent) => {

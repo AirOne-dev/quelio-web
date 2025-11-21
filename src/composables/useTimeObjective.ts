@@ -4,7 +4,7 @@ import { useTimeCalculations } from './useTimeCalculations'
 export function useTimeObjective(
   data: Ref<{ total_paid: string }>,
   missingDates: Ref<string[]>,
-  daysLeft: Ref<string[] | null>,
+  _daysLeft: Ref<string[] | null>,
   saveLocalStorage: (label: string, data: any) => void,
   loadLocalStorage: (label: string) => any
 ) {

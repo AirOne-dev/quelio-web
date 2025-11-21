@@ -44,6 +44,48 @@
     100% { background-position: -200% 0; }
   }
 
+  /* Scroll-driven animations for WeekStats */
+  @keyframes shrink-padding {
+    from {
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+    }
+    to {
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+  }
+
+  @keyframes shrink-height {
+    from {
+      height: auto;
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+      margin: 0;
+    }
+  }
+
+  @keyframes shrink-text {
+    from {
+      font-size: 1.5rem;
+    }
+    to {
+      font-size: 1.125rem;
+    }
+  }
+
+  @keyframes shrink-stats-text {
+    from {
+      font-size: 1.25rem;
+    }
+    to {
+      font-size: 0.875rem;
+    }
+  }
+
   /* Custom Animations */
   --animate-fade-in-up: fade-in-up 0.6s ease-out forwards;
   --animate-slide-up: slide-up 0.5s ease-out forwards;
@@ -54,9 +96,13 @@
 
 /* Global styles */
 @layer base {
-  html {
-    @apply bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen;
+  html, body {
+    @apply bg-gradient-to-br from-gray-900 to-gray-800;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  #app {
+    @apply bg-gradient-to-br from-gray-900 to-gray-800;
   }
 
   /* Scrollbar styles */
@@ -99,5 +145,32 @@
   /* Hide elements with v-cloak */
   [v-cloak] {
     display: none;
+  }
+
+  /* Scroll-driven animations for WeekStats */
+  @supports (animation-timeline: scroll()) {
+    .week-stats-container {
+      animation: shrink-padding linear both;
+      animation-timeline: scroll(nearest);
+      animation-range: 0px 100px;
+    }
+
+    .week-stats-title {
+      animation: shrink-text linear both;
+      animation-timeline: scroll(nearest);
+      animation-range: 0px 100px;
+    }
+
+    .week-stats-grid {
+      animation: shrink-height linear both;
+      animation-timeline: scroll(nearest);
+      animation-range: 0px 100px;
+    }
+
+    .week-stats-value {
+      animation: shrink-stats-text linear both;
+      animation-timeline: scroll(nearest);
+      animation-range: 0px 100px;
+    }
   }
 }

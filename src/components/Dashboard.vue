@@ -103,16 +103,6 @@ const handleMarkAbsentAndClose = (date: string, section: 'day' | 'morning' | 'af
   togglePresenceModal()
 }
 
-const waitForElement = (selector: string, callback: (element: HTMLElement) => void) => {
-  const interval = setInterval(() => {
-    const element = document.querySelector(selector) as HTMLElement
-    if (element) {
-      clearInterval(interval)
-      callback(element)
-    }
-  }, 100)
-}
-
 // Lifecycle hooks
 onMounted(() => {
   getCustomBorneForSuggestions()
@@ -124,15 +114,6 @@ onMounted(() => {
       selectedSuggestedBlock.value = null
     }
   })
-
-  waitForElement('#daysContainerRef', (e) => {
-    e.addEventListener('scroll', (ev) => {
-      const statsRef = document.getElementById('statsRef')
-      if (statsRef) {
-        statsRef.style.setProperty('margin-bottom', `${-1 * ((ev.target as HTMLElement).scrollTop)}px`)
-      }
-    })
-  })
 })
 </script>
 
@@ -140,7 +121,7 @@ onMounted(() => {
   <!-- Offline banner -->
   <OfflineBanner :offline="offline" />
 
-  <div class="space-y-8 overflow-hidden flex flex-col items-center" :class="offline ? 'pt-24' : ''" style="max-height: 100dwh;">
+  <div class="pb-40" :class="offline ? 'pt-24' : ''">
     <!-- Header Stats -->
     <WeekStats
       :total-effective="data.total_effective"
@@ -151,7 +132,7 @@ onMounted(() => {
     />
 
     <!-- Days -->
-    <div id="daysContainerRef" class="space-y-6 pb-40 h-full overflow-y-auto scrollbar-none w-full" style="max-height: calc(100dvh - 234px)">
+    <div class="space-y-6 px-6 mt-44">
       <DayCard
         v-for="(times, date, index) in days"
         :key="date"

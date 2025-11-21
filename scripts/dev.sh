@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Fonction pour nettoyer et arrêter Docker à la sortie
+cleanup() {
+    echo ""
+    echo "🛑 Arrêt des services..."
+    docker compose down
+    echo "✅ Services arrêtés"
+    exit 0
+}
+
+# Capturer les signaux de sortie (Ctrl+C, kill, etc.)
+trap cleanup SIGINT SIGTERM EXIT
+
 echo "🚀 Démarrage de l'environnement de développement..."
 
 # Vérifier si pnpm est installé
@@ -21,7 +33,26 @@ docker compose --profile dev up -d
 
 # Attendre que l'API soit prête
 echo "⏳ Attente du démarrage de l'API..."
-sleep 3
+MAX_ATTEMPTS=50
+ATTEMPT=0
+API_URL="http://localhost:8080"
+
+while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL" 2>/dev/null)
+    if [ -n "$HTTP_CODE" ] && [ "$HTTP_CODE" != "000" ]; then
+        echo "✅ L'API est prête!"
+        break
+    fi
+    ATTEMPT=$((ATTEMPT + 1))
+    if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+        echo "⚠️  Timeout: L'API n'a pas répondu après 10 secondes"
+        echo "   Le serveur Vite va quand même démarrer..."
+    else
+        printf "\r   Tentative %d/%d..." "$ATTEMPT" "$MAX_ATTEMPTS"
+        sleep 0.2
+    fi
+done
+echo ""  # Nouvelle ligne après les tentatives
 
 # Démarrer Vite en mode dev
 echo "🔥 Démarrage du serveur Vite..."

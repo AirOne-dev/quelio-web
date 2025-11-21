@@ -95,9 +95,11 @@ watch(() => props.open, (newVal) => {
         transitionDuration: isDragging ? '0ms' : isClosing ? '300ms' : '400ms'
       }"
     >
+      <div class="absolute h-[50px] top-0 w-full bg-gradient-to-b from-transparent to-white/5">
+      </div>
       <!-- Drag handle area -->
       <div
-        class="flex justify-center pt-4 pb-2 bg-gradient-to-b from-transparent to-white/5 cursor-grab active:cursor-grabbing"
+        class="flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing"
         @mousedown="handleDragStart"
         @touchstart="handleDragStart"
         @mousemove="handleDragMove"

@@ -7,7 +7,7 @@ export function useWeekDays(
   missingDates: Ref<string[]>,
   saveLocalStorage: (label: string, data: any) => void
 ) {
-  const { getCurrentWeekDates, formatDataDate } = useTimeCalculations()
+  const { getCurrentWeekDates } = useTimeCalculations()
 
   const days = computed(() => {
     const daysObj: Record<string, string[]> = {}
