@@ -151,7 +151,7 @@ onMounted(() => {
     />
 
     <!-- Days -->
-    <div id="daysContainerRef" class="space-y-6 pb-40 h-full overflow-y-auto hide-scrollbar w-full" style="max-height: calc(100dvh - 234px)">
+    <div id="daysContainerRef" class="space-y-6 pb-40 h-full overflow-y-auto scrollbar-none w-full" style="max-height: calc(100dvh - 234px)">
       <DayCard
         v-for="(times, date, index) in days"
         :key="date"
@@ -172,7 +172,7 @@ onMounted(() => {
     </div>
 
     <!-- Debug Console -->
-    <DebugConsole :logs="logs" :debug-mode="debugMode" />
+    <DebugConsole :logs="logs" :debug-mode="debugMode" :username="credentials.username" />
 
     <!-- Settings modal -->
     <SettingsModal

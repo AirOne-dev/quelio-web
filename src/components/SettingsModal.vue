@@ -39,7 +39,7 @@ const changeDebugMode = (event: Event) => {
       <!-- Settings List -->
       <div class="flex flex-col gap-3">
         <!-- Hour Objective -->
-        <div class="glass-card rounded-2xl p-4">
+        <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
           <label for="hour-objective" class="flex items-center justify-between cursor-pointer group">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/30 transition-colors">
@@ -64,7 +64,7 @@ const changeDebugMode = (event: Event) => {
         </div>
 
         <!-- Debug Mode -->
-        <div class="glass-card rounded-2xl p-4">
+        <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
           <label for="debug-mode" class="flex items-center justify-between cursor-pointer group">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition-colors">
@@ -81,7 +81,8 @@ const changeDebugMode = (event: Event) => {
               <input
                 type="checkbox"
                 id="debug-mode"
-                class="sr-only peer"
+                class="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0 peer"
+                style="clip: rect(0, 0, 0, 0)"
                 :checked="debugMode"
                 @input="changeDebugMode"
               >
@@ -94,7 +95,7 @@ const changeDebugMode = (event: Event) => {
         <!-- Logout Button -->
         <button
           @click="emit('logout')"
-          class="glass-card rounded-2xl p-4 flex items-center gap-3 cursor-pointer hover:bg-red-500/10 active:scale-[0.98] transition-all group mt-2"
+          class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex items-center gap-3 cursor-pointer hover:bg-red-500/10 active:scale-[0.98] transition-all group mt-2"
         >
           <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
             <svg class="w-5 h-5 text-red-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -113,24 +114,3 @@ const changeDebugMode = (event: Event) => {
     </div>
   </Drawer>
 </template>
-
-<style scoped>
-.glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Hide default checkbox but keep accessible */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-</style>

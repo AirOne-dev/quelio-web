@@ -24,7 +24,7 @@ const minutesToTime = (minutes: number): string => {
 <template>
   <div id="statsContainerRef" class="overflow-hidden rounded-2xl w-full mt-6" style="min-height: 84px;">
     <div class="px-6">
-      <div id="statsRef" class="stats-card glass p-6 space-y-6 rounded-2xl max-w-md w-full mx-auto">
+      <div id="statsRef" class="stats-card opacity-0 animate-[fade-in_0.5s_ease-out_0.3s_forwards] bg-white/5 backdrop-blur-xl border border-white/10 p-6 space-y-6 rounded-2xl max-w-md w-full mx-auto">
         <div class="flex justify-between items-center">
           <h1 class="text-2xl font-bold tracking-tight flex justify-center">
             <span>Ma semaine</span>

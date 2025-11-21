@@ -59,11 +59,17 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
 <template>
   <div class="px-6">
     <div
-      class="day-card glass rounded-2xl overflow-hidden w-full max-w-md mx-auto"
-      :class="{ 'day-card-half-opacity': isDayCardHalfTransparent }"
+      class="day-card opacity-0 translate-y-5 animate-[slide-up_0.5s_ease-out_forwards] rounded-2xl overflow-hidden w-full max-w-md mx-auto relative"
+      :class="[
+        isDayCardHalfTransparent
+          ? 'border-r-[#222b38] border-b-[#222b38] border-t-white/10 border-l-white/10'
+          : 'bg-white/5 backdrop-blur-xl border border-white/10'
+      ]"
       :style="{
         animationDelay: index * 0.1 + 's',
-        opacity: !isDayCardHalfTransparent && isDayCardTransparent ? '0.3 !important' : 1
+        opacity: !isDayCardHalfTransparent && isDayCardTransparent ? '0.3 !important' : 1,
+        background: isDayCardHalfTransparent ? 'linear-gradient(to bottom right, rgba(255, 255, 255, 0.05) 50%, #1b2332 50%)' : undefined,
+        backdropFilter: isDayCardHalfTransparent ? undefined : 'blur(12px)'
       }"
     >
       <div @click="handleShowMore" class="p-6 cursor-pointer">
@@ -127,12 +133,12 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
 
         <!-- Timeline -->
         <div v-if="isDayCardHalfTransparent || !isDayCardTransparent" class="relative">
-          <div class="timeline-container relative">
+          <div class="timeline-container relative h-4 bg-white/10 rounded-lg">
             <template v-if="times">
               <div
                 v-for="(block, idx) in getTimeBlocks(times)"
                 :key="idx"
-                class="time-block z-10 pointer-events-none"
+                class="absolute h-full bg-gradient-to-r from-indigo-600 to-indigo-500 transition-all duration-300 rounded-md z-10 pointer-events-none after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-r after:from-white/10 after:via-white/20 after:to-white/10 after:bg-[length:200%_100%] after:animate-[shine_3s_infinite] after:rounded-md"
                 :style="getBlockStyle(block)"
               />
             </template>
@@ -141,7 +147,7 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
                 v-for="(block, idx) in suggestedTimeBlocks"
                 :key="idx"
                 class="suggestedBlock border-2 absolute h-full transition-all duration-200 flex items-center rounded-md"
-                :class="`${date}-${idx}` === selectedSuggestedBlock ? `selectedSuggestedBlock ${hasBeforeSelector(block, date, times)}` : 'opacity-20'"
+                :class="`${date}-${idx}` === selectedSuggestedBlock ? `rounded-r-none ${hasBeforeSelector(block, date, times) ? 'rounded-l-none' : ''}` : 'opacity-20'"
                 :style="getBlockStyle(block)"
                 style="background: repeating-linear-gradient(110deg,#aaa, #aaa 2px, transparent 2px, transparent 6px); border-color: #aaa;"
                 @click.stop="handleSelectSuggestedBlock(date, idx)"
@@ -159,20 +165,21 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
               </div>
             </template>
           </div>
-          <div class="time-labels">
+          <div class="flex text-white/60 text-xs mt-2 relative">
             <span
-              v-for="hour in 12"
+              v-for="hour in [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]"
               :key="hour"
-              class="text-center"
-              :class="{'opacity-0': ![8, 10, 12, 14, 16, 18].includes(hour + 7)}"
+              class="absolute -translate-x-1/2"
+              :class="{'opacity-0': ![8, 10, 12, 14, 16, 18].includes(hour)}"
+              :style="{ left: `${((hour - 8) / 11) * 100}%` }"
             >
-              {{ hour + 7 }}
+              {{ hour }}
             </span>
           </div>
         </div>
 
         <!-- Time Blocks -->
-        <div class="time-blocks overflow-y-hidden transition-height" style="height: 0px;">
+        <div class="time-blocks overflow-y-hidden transition-[height] duration-300 ease-in-out" style="height: 0px;">
           <div v-if="times" class="space-y-1 pt-8">
             <div
               v-for="(block, idx) in getTimeBlocks(times)"

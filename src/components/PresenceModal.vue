@@ -29,7 +29,7 @@ const emit = defineEmits<Emits>()
         <!-- Full Day -->
         <button
           @click="presenceDate && emit('mark-absent', presenceDate, 'day')"
-          class="glass-card rounded-2xl p-5 flex items-center gap-4 cursor-pointer hover:bg-indigo-500/10 active:scale-[0.98] transition-all group"
+          class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex items-center gap-4 cursor-pointer hover:bg-indigo-500/10 active:scale-[0.98] transition-all group"
         >
           <div class="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/30 transition-colors">
             <svg class="w-6 h-6 text-indigo-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
@@ -50,7 +50,7 @@ const emit = defineEmits<Emits>()
           <!-- Morning -->
           <button
             @click="presenceDate && emit('mark-absent', presenceDate, 'morning')"
-            class="glass-card rounded-2xl p-4 flex flex-col items-center gap-3 cursor-pointer hover:bg-amber-500/10 active:scale-[0.98] transition-all group"
+            class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-3 cursor-pointer hover:bg-amber-500/10 active:scale-[0.98] transition-all group"
           >
             <div class="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition-colors">
               <svg class="w-6 h-6 text-amber-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -66,7 +66,7 @@ const emit = defineEmits<Emits>()
           <!-- Afternoon -->
           <button
             @click="presenceDate && emit('mark-absent', presenceDate, 'afternoon')"
-            class="glass-card rounded-2xl p-4 flex flex-col items-center gap-3 cursor-pointer hover:bg-purple-500/10 active:scale-[0.98] transition-all group"
+            class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-3 cursor-pointer hover:bg-purple-500/10 active:scale-[0.98] transition-all group"
           >
             <div class="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
               <svg class="w-6 h-6 text-purple-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
@@ -88,11 +88,3 @@ const emit = defineEmits<Emits>()
     </div>
   </Drawer>
 </template>
-
-<style scoped>
-.glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-</style>
