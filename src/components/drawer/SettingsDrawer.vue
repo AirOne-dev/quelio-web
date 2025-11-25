@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import Drawer from './Drawer.vue'
 import ThemeSelector from '../ThemeSelector.vue'
+import { updateUserPreferences } from '../../composables/useUserPreferences'
 
 interface Props {
   minutesObjective: number
   debugMode: boolean
   show: boolean
+  username: string
 }
 
 interface Emits {
@@ -15,12 +17,17 @@ interface Emits {
   (e: 'update:debug-mode', value: boolean): void
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const changeHourObjective = (event: Event) => {
+const changeHourObjective = async (event: Event) => {
   const target = event.target as HTMLInputElement
-  emit('update:minutes-objective', Number(target.value) * 60)
+  const minutes = Number(target.value) * 60
+
+  emit('update:minutes-objective', minutes)
+
+  // Save to API
+  await updateUserPreferences(props.username, { minutes_objective: minutes })
 }
 
 const changeDebugMode = (event: Event) => {

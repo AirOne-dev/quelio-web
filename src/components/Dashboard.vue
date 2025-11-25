@@ -107,7 +107,13 @@ const handleMarkAbsentAndClose = (date: string, section: 'day' | 'morning' | 'af
 onMounted(() => {
   getCustomBorneForSuggestions()
   loadMissingDates()
-  loadObjective()
+
+  // Load objective from API preferences if available, otherwise from localStorage
+  if (props.data.preferences?.minutes_objective) {
+    changeHourObjective(props.data.preferences.minutes_objective)
+  } else {
+    loadObjective()
+  }
 
   document.addEventListener('click', (event) => {
     if (selectedSuggestedBlock.value && !(event.target as HTMLElement).closest('.suggestedBlock')) {
@@ -160,6 +166,7 @@ onMounted(() => {
       :show="showSettingsDrawer"
       :minutes-objective="minutesObjective"
       :debug-mode="debugMode"
+      :username="credentials.username"
       @close="toggleSettingsDrawer"
       @logout="emit('logout')"
       @update:minutes-objective="changeHourObjective"

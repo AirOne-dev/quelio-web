@@ -9,11 +9,18 @@ export interface TimeBlock {
   duration: string
 }
 
+export interface UserPreferences {
+  theme?: string
+  minutes_objective?: number
+}
+
 export interface ApiResponse {
   hours: Record<string, string[]>
   total_effective: string
   total_paid: string
-  last_save: string
+  last_save?: string
+  preferences?: UserPreferences
+  token?: string
   error?: string
 }
 

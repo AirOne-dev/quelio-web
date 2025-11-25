@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { updateUserPreferences } from './useUserPreferences'
 
 export type ThemeName = 'midnight' | 'light' | 'abyss' | 'ocean' | 'forest' | 'sunset' | 'lavender'
 
@@ -94,7 +95,7 @@ const themeModules: Record<ThemeName, () => Promise<{ default: string }>> = {
 }
 
 export function useTheme() {
-  const setTheme = async (themeName: ThemeName) => {
+  const setTheme = async (themeName: ThemeName, saveToApi = true) => {
     currentTheme.value = themeName
 
     // Charger dynamiquement le CSS du thème
@@ -113,27 +114,33 @@ export function useTheme() {
       currentStyleElement.textContent = cssText
       document.head.appendChild(currentStyleElement)
 
-      // Sauvegarder dans localStorage
+      // Sauvegarder dans l'API et localStorage
       const username = localStorage.getItem('quelio_username')
       if (username) {
         localStorage.setItem(`quelio_theme_${username}`, themeName)
+
+        // Save to API if requested
+        if (saveToApi) {
+          await updateUserPreferences(username, { theme: themeName })
+        }
       }
     } catch (error) {
       console.error(`Erreur lors du chargement du thème ${themeName}:`, error)
     }
   }
 
-  const loadTheme = () => {
+  const loadTheme = (serverTheme?: string) => {
     const username = localStorage.getItem('quelio_username')
     if (username) {
-      const savedTheme = localStorage.getItem(`quelio_theme_${username}`) as ThemeName
+      // Priority: server theme > localStorage > default
+      const savedTheme = (serverTheme || localStorage.getItem(`quelio_theme_${username}`)) as ThemeName
       if (savedTheme && themes[savedTheme]) {
-        setTheme(savedTheme)
+        setTheme(savedTheme, false) // Don't save back to API when loading
       } else {
-        setTheme('midnight')
+        setTheme('midnight', false)
       }
     } else {
-      setTheme('midnight')
+      setTheme('midnight', false)
     }
   }
 

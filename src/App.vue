@@ -61,8 +61,13 @@ const login = async () => {
 
     saveCredentials()
 
-    // Load theme after successful login
-    loadTheme()
+    // Save token to localStorage if provided
+    if (responseData.token) {
+      localStorage.setItem(`quelio_token_${credentials.value.username}`, responseData.token)
+    }
+
+    // Load theme and preferences from server
+    loadTheme(responseData.preferences?.theme)
   } catch (err) {
     error.value = "Erreur de connexion. Vérifiez vos identifiants."
     console.error('Erreur:', err)
@@ -86,8 +91,12 @@ const saveCredentials = () => {
 
 const clearCredentials = () => {
   document.cookie = 'quelio_credentials=; max-age=0; path=/;'
-  // Clear username from localStorage
+  // Clear username and token from localStorage
+  const username = credentials.value.username
   localStorage.removeItem('quelio_username')
+  if (username) {
+    localStorage.removeItem(`quelio_token_${username}`)
+  }
 }
 
 const loadCredentials = () => {
@@ -113,8 +122,7 @@ const loadCredentials = () => {
 const autoLogin = async () => {
   if (loadCredentials()) {
     await login()
-    // Load theme after username is available
-    loadTheme()
+    // Theme is loaded inside login() with server preferences
   } else {
     loading.value = false
     // Load default theme
