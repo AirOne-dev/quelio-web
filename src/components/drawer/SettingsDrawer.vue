@@ -37,7 +37,7 @@ const changeDebugMode = (event: Event) => {
       </div>
 
       <!-- Settings List -->
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3 max-w-md mx-auto w-full">
         <!-- Hour Objective -->
         <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
           <label for="hour-objective" class="flex items-center justify-between cursor-pointer group">

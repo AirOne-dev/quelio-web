@@ -25,7 +25,7 @@ const emit = defineEmits<Emits>()
       </div>
 
       <!-- Options -->
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3 max-w-md mx-auto w-full">
         <!-- Full Day -->
         <button
           @click="presenceDate && emit('mark-absent', presenceDate, 'day')"

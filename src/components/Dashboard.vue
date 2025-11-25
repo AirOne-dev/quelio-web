@@ -4,15 +4,15 @@ import DayCard from './DayCard.vue'
 import WeekStats from './WeekStats.vue'
 import OfflineBanner from './OfflineBanner.vue'
 import DebugConsole from './DebugConsole.vue'
-import SettingsModal from './SettingsModal.vue'
-import PresenceModal from './PresenceModal.vue'
+import SettingsDrawer from './drawer/SettingsDrawer.vue'
+import AbsenceDrawer from './drawer/AbsenceDrawer.vue'
 import { useLocalStorage } from '../composables/useLocalStorage'
 import { useAbsences } from '../composables/useAbsences'
 import { useWeekDays } from '../composables/useWeekDays'
 import { useTimeObjective } from '../composables/useTimeObjective'
 import { useDaysLeft } from '../composables/useDaysLeft'
 import { useSuggestions } from '../composables/useSuggestions'
-import { useModals } from '../composables/useModals'
+import { useDrawers } from '../composables/useDrawers'
 import type { ApiResponse, Credentials, LogEntry } from '../types'
 
 // Props
@@ -68,13 +68,13 @@ const {
 } = useSuggestions(days, daysLeft, remainingMinutes, saveLocalStorage, loadLocalStorage)
 
 const {
-  showSettingsModal,
-  showPresenceModal,
+  showSettingsDrawer,
+  showAbsenceDrawer,
   presenceDate,
-  toggleBottomModal,
-  togglePresenceModal,
+  toggleSettingsDrawer,
+  toggleAbsenceDrawer,
   handleMarkAbsent
-} = useModals()
+} = useDrawers()
 
 // Methods
 const showMore = (event: MouseEvent) => {
@@ -100,7 +100,7 @@ const changeDebugMode = (value: boolean) => {
 
 const handleMarkAbsentAndClose = (date: string, section: 'day' | 'morning' | 'afternoon' = 'day') => {
   markAbsent(date, section)
-  togglePresenceModal()
+  toggleAbsenceDrawer()
 }
 
 // Lifecycle hooks
@@ -128,7 +128,7 @@ onMounted(() => {
       :total-paid="data.total_paid"
       :remaining-minutes="remainingMinutes"
       @refresh="emit('refresh')"
-      @open-settings="toggleBottomModal"
+      @open-settings="toggleSettingsDrawer"
     />
 
     <!-- Days -->
@@ -156,21 +156,21 @@ onMounted(() => {
     <DebugConsole :logs="logs" :debug-mode="debugMode" :username="credentials.username" />
 
     <!-- Settings modal -->
-    <SettingsModal
-      :show="showSettingsModal"
+    <SettingsDrawer
+      :show="showSettingsDrawer"
       :minutes-objective="minutesObjective"
       :debug-mode="debugMode"
-      @close="toggleBottomModal"
+      @close="toggleSettingsDrawer"
       @logout="emit('logout')"
       @update:minutes-objective="changeHourObjective"
       @update:debug-mode="changeDebugMode"
     />
 
     <!-- Mark absent modal -->
-    <PresenceModal
-      :show="showPresenceModal"
+    <AbsenceDrawer
+      :show="showAbsenceDrawer"
       :presence-date="presenceDate"
-      @close="togglePresenceModal"
+      @close="toggleAbsenceDrawer"
       @mark-absent="handleMarkAbsentAndClose"
     />
   </div>

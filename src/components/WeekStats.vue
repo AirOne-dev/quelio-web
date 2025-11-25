@@ -50,8 +50,20 @@ onBeforeUnmount(() => {
 <template>
   <div
     class="fixed top-0 left-0 right-0 z-40 pointer-events-none pt-6"
-    :style="{ paddingBottom: `${24 - scrollProgress * 16}px` }"
   >
+    <!-- fond gradient blur derrière la barre -->
+    <div
+      class="absolute top-0 w-full"
+      :style="{
+        opacity: scrollProgress,
+        height: 'calc(100% + calc(var(--spacing) * 12))',
+        mask: 'linear-gradient(black, black, transparent)',
+        backdropFilter: 'blur(24px)',
+
+      }"
+    >
+    </div>
+
     <div
       class="px-6 w-full"
       :style="{
@@ -59,13 +71,7 @@ onBeforeUnmount(() => {
       }"
     >
       <div
-        class="opacity-0 animate-[fade-in_0.5s_ease-out_0.3s_forwards] bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto"
-        :style="{
-          paddingLeft: '24px',
-          paddingRight: '24px',
-          paddingTop: `${24 - scrollProgress * 16}px`,
-          paddingBottom: `${24 - scrollProgress * 16}px`,
-        }"
+        class="opacity-0 px-[24px] py-4 animate-[fade-in_0.5s_ease-out_0.3s_forwards] bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto min-w-[255px]"
       >
         <!-- Header avec titre et icônes -->
         <div class="flex justify-between items-center">
@@ -113,11 +119,11 @@ onBeforeUnmount(() => {
 
         <!-- Stats Grid -->
         <div
-          class="grid grid-cols-3 gap-4 transition-[height,margin-top] duration-200"
+          class="grid grid-cols-3 gap-4"
           :style="{
-            opacity: scrollProgress > 0.7 ? (1 - scrollProgress) / 0.3 : 1,
+            opacity: (1 - scrollProgress*2),
             height:
-              scrollProgress > 0.7 ? `${((1 - scrollProgress) / 0.3) * 70}px` : '70px',
+              `min(${((1 - scrollProgress) / 0.7) * 70}px, 70px)`,
           }"
         >
           <div class="flex flex-col items-center mt-auto">
@@ -146,15 +152,14 @@ onBeforeUnmount(() => {
 
         <!-- Temps restant compact (apparaît en haut à droite) -->
         <div
-          v-if="scrollProgress > 0.7"
-          class="absolute right-14 flex items-center"
+          class="absolute flex items-center right-16"
           :style="{
-            top: `${24 - scrollProgress * 16}px`,
-            opacity: (scrollProgress - 0.7) / 0.3,
+            top: `${30 - scrollProgress * 16}px`,
+            opacity: scrollProgress,
             pointerEvents: 'none',
           }"
         >
-          <div class="text-right whitespace-nowrap pr-3 border-r border-white/20">
+          <div class="text-right whitespace-nowrap">
             <div class="text-white/50 text-xs leading-none mb-0.5">Restant</div>
             <div
               class="font-bold text-sm leading-none"
