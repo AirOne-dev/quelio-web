@@ -132,7 +132,7 @@ onMounted(() => {
     />
 
     <!-- Days -->
-    <div class="space-y-6 px-6 mt-44">
+    <div class="space-y-6 px-6 mt-40">
       <DayCard
         v-for="(times, date, index) in days"
         :key="date"

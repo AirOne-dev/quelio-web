@@ -81,7 +81,7 @@ watch(() => props.open, (newVal) => {
     <div
       v-if="open"
       class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
-      :class="isAnimating ? 'opacity-0' : 'opacity-100'"
+      :class="isAnimating || isClosing ? 'opacity-0' : 'opacity-100'"
       @click="handleClose"
     />
 
@@ -91,8 +91,8 @@ watch(() => props.open, (newVal) => {
       class="fixed inset-x-0 bottom-0 z-50 flex flex-col transition-transform duration-[400ms]"
       :style="{
         transform: isClosing ? 'translateY(100%)' : isAnimating ? 'translateY(100%)' : `translateY(${translateY}px)`,
-        transitionTimingFunction: isClosing ? 'cubic-bezier(0.4, 0, 1, 1)' : 'cubic-bezier(0.32, 0.72, 0, 1)',
-        transitionDuration: isDragging ? '0ms' : isClosing ? '300ms' : '400ms'
+        transitionTimingFunction: isClosing ? 'cubic-bezier(0.32, 0.72, 0, 1)' : 'cubic-bezier(0.32, 0.72, 0, 1)',
+        transitionDuration: isDragging ? '0ms' : isClosing ? '500ms' : '400ms'
       }"
     >
       <div class="absolute h-[50px] top-0 w-full bg-gradient-to-b from-transparent to-white/5">

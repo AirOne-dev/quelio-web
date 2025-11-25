@@ -121,19 +121,33 @@ onBeforeUnmount(() => {
         <div
           class="grid grid-cols-3 gap-4"
           :style="{
-            opacity: (1 - scrollProgress*2),
             height:
               `min(${((1 - scrollProgress) / 0.7) * 70}px, 70px)`,
           }"
         >
-          <div class="flex flex-col items-center mt-auto">
+          <div class="flex flex-col items-center mt-auto absolute left-6 top-16" :style="{ opacity: (1 - scrollProgress*2) }">
             <div class="text-indigo-300 text-xs mb-1">Effectif</div>
             <div class="font-bold" :style="{ fontSize: `${20 - scrollProgress * 6}px` }">
               {{ totalEffective }}
             </div>
           </div>
-          <div class="flex flex-col items-center mt-auto">
-            <div class="text-indigo-300 text-xs mb-1">Restant</div>
+          <div
+            class="flex flex-col items-center mt-auto absolute space-y-1"
+            :style="{
+              top: `calc(var(--spacing) * ${16 * (1 - scrollProgress)})`,
+              marginTop: `${scrollProgress*12}px`,
+              right: `${50 * (1 - scrollProgress)}%`,
+              marginRight: `${scrollProgress*85}px`,
+              transform: 'translateX(50%)'
+            }"
+          >
+            <div
+              class="text-indigo-300 text-xs transition-colors"
+              :class="{ '!text-white/50': scrollProgress >= 0.5 }"
+              :style="{ marginBottom: `calc(var(--spacing) * ${1 * (0.1 - scrollProgress)})` }"
+            >
+              Restant
+            </div>
             <div
               class="font-bold"
               :class="remainingMinutes > 0 ? 'text-red-300' : 'text-green-300'"
@@ -142,30 +156,10 @@ onBeforeUnmount(() => {
               {{ minutesToTime(remainingMinutes) }}
             </div>
           </div>
-          <div class="flex flex-col items-center mt-auto">
+          <div class="flex flex-col items-center mt-auto absolute right-6 top-16" :style="{ opacity: (1 - scrollProgress*2) }">
             <div class="text-indigo-300 text-xs mb-1">Payé</div>
             <div class="font-bold" :style="{ fontSize: `${20 - scrollProgress * 6}px` }">
               {{ totalPaid }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Temps restant compact (apparaît en haut à droite) -->
-        <div
-          class="absolute flex items-center right-16"
-          :style="{
-            top: `${30 - scrollProgress * 16}px`,
-            opacity: scrollProgress,
-            pointerEvents: 'none',
-          }"
-        >
-          <div class="text-right whitespace-nowrap">
-            <div class="text-white/50 text-xs leading-none mb-0.5">Restant</div>
-            <div
-              class="font-bold text-sm leading-none"
-              :class="remainingMinutes > 0 ? 'text-red-300' : 'text-green-300'"
-            >
-              {{ minutesToTime(remainingMinutes) }}
             </div>
           </div>
         </div>
