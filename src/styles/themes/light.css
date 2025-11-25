@@ -1,0 +1,21 @@
+:root {
+  /* Light - Blanc épuré avec contraste élevé */
+  --bg-from: #F9FAFB;
+  --bg-to: #F3F4F6;
+  --card-bg: rgba(255, 255, 255, 0.98);
+  --card-hover: rgba(255, 255, 255, 1);
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
+  --border: rgba(0, 0, 0, 0.12);
+  --accent: #6366F1;
+  --accent-hover: #4F46E5;
+  --accent-light: rgba(99, 102, 241, 0.1);
+  --accent-rgb: 99, 102, 241;
+  --danger: #DC2626;
+  --success: #059669;
+  --warning: #EA580C;
+  --warning-rgb: 234, 88, 12;
+  --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+  --scrollbar-track: rgba(0, 0, 0, 0.05);
+}

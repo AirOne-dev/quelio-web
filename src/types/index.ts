@@ -43,3 +43,15 @@ export interface LogEntry {
   type: 'log' | 'warn' | 'error'
   message: string
 }
+
+export type ThemeName = 'midnight' | 'light' | 'abyss' | 'ocean' | 'forest' | 'sunset' | 'lavender'
+
+export interface Theme {
+  name: ThemeName
+  label: string
+  colors: {
+    primary: string
+    secondary: string
+    accent: string
+  }
+}

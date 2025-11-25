@@ -1,0 +1,21 @@
+:root {
+  /* Ocean - Gris avec touches de bleu */
+  --bg-from: #1e293b;
+  --bg-to: #0f172a;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-hover: rgba(255, 255, 255, 0.08);
+  --text-primary: #F1F5F9;
+  --text-secondary: rgba(241, 245, 249, 0.7);
+  --text-tertiary: rgba(241, 245, 249, 0.5);
+  --border: rgba(255, 255, 255, 0.1);
+  --accent: #0EA5E9;
+  --accent-hover: #38BDF8;
+  --accent-light: rgba(14, 165, 233, 0.1);
+  --accent-rgb: 14, 165, 233;
+  --danger: #38BDF8;
+  --success: #22D3EE;
+  --warning: #60A5FA;
+  --warning-rgb: 96, 165, 250;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --scrollbar-track: rgba(255, 255, 255, 0.05);
+}

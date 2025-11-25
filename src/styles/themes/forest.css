@@ -1,0 +1,21 @@
+:root {
+  /* Forest - Gris avec touches de vert */
+  --bg-from: #1a1f1a;
+  --bg-to: #111411;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-hover: rgba(255, 255, 255, 0.08);
+  --text-primary: #F0FDF4;
+  --text-secondary: rgba(240, 253, 244, 0.7);
+  --text-tertiary: rgba(240, 253, 244, 0.5);
+  --border: rgba(255, 255, 255, 0.1);
+  --accent: #10B981;
+  --accent-hover: #34D399;
+  --accent-light: rgba(16, 185, 129, 0.1);
+  --accent-rgb: 16, 185, 129;
+  --danger: #34D399;
+  --success: #6EE7B7;
+  --warning: #FCD34D;
+  --warning-rgb: 252, 211, 77;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --scrollbar-track: rgba(255, 255, 255, 0.05);
+}

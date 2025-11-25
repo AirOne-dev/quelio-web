@@ -53,13 +53,11 @@ onBeforeUnmount(() => {
   >
     <!-- fond gradient blur derrière la barre -->
     <div
-      class="absolute top-0 w-full"
+      class="absolute top-0 w-full backdrop-blur-[24px]"
       :style="{
         opacity: scrollProgress,
         height: 'calc(100% + calc(var(--spacing) * 12))',
-        mask: 'linear-gradient(black, black, transparent)',
-        backdropFilter: 'blur(24px)',
-
+        mask: 'linear-gradient(black, black, transparent)'
       }"
     >
     </div>
@@ -71,13 +69,16 @@ onBeforeUnmount(() => {
       }"
     >
       <div
-        class="opacity-0 px-[24px] py-4 animate-[fade-in_0.5s_ease-out_0.3s_forwards] bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto min-w-[255px]"
+        class="opacity-0 px-[24px] py-4 animate-[fade-in_0.5s_ease-out_0.3s_forwards] backdrop-blur-xl rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto min-w-[255px] bg-[var(--card-bg)] border border-[var(--border)]"
       >
         <!-- Header avec titre et icônes -->
         <div class="flex justify-between items-center">
           <h1
-            class="font-bold tracking-tight flex items-center"
-            :style="{ fontSize: `${24 - scrollProgress * 6}px`, lineHeight: '1.2' }"
+            class="font-bold tracking-tight flex items-center text-[var(--text-primary)]"
+            :style="{
+              fontSize: `${24 - scrollProgress * 6}px`,
+              lineHeight: '1.2'
+            }"
           >
             <span>Ma semaine</span>
             <div
@@ -86,7 +87,7 @@ onBeforeUnmount(() => {
             >
               <svg
                 title="Actualiser vos horaires"
-                class="text-indigo-300 w-full h-full hover:text-indigo-200 transition-colors"
+                class="w-full h-full hover:opacity-80 transition-opacity text-[var(--accent)]"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
               >
@@ -104,7 +105,7 @@ onBeforeUnmount(() => {
             >
               <svg
                 title="Réglages"
-                class="text-indigo-300 w-full h-full hover:text-indigo-200 transition-colors"
+                class="w-full h-full hover:opacity-80 transition-opacity text-[var(--accent)]"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
               >
@@ -126,8 +127,13 @@ onBeforeUnmount(() => {
           }"
         >
           <div class="flex flex-col items-center mt-auto absolute left-6 top-16" :style="{ opacity: (1 - scrollProgress*2) }">
-            <div class="text-indigo-300 text-xs mb-1">Effectif</div>
-            <div class="font-bold" :style="{ fontSize: `${20 - scrollProgress * 6}px` }">
+            <div class="text-xs mb-1 text-[var(--accent)]">Effectif</div>
+            <div
+              class="font-bold text-[var(--text-primary)]"
+              :style="{
+                fontSize: `${20 - scrollProgress * 6}px`
+              }"
+            >
               {{ totalEffective }}
             </div>
           </div>
@@ -142,23 +148,32 @@ onBeforeUnmount(() => {
             }"
           >
             <div
-              class="text-indigo-300 text-xs transition-colors"
-              :class="{ '!text-white/50': scrollProgress >= 0.5 }"
-              :style="{ marginBottom: `calc(var(--spacing) * ${1 * (0.1 - scrollProgress)})` }"
+              class="text-xs transition-colors"
+              :style="{
+                marginBottom: `calc(var(--spacing) * ${1 * (0.1 - scrollProgress)})`,
+                color: scrollProgress >= 0.5 ? 'var(--text-tertiary)' : 'var(--accent)'
+              }"
             >
               Restant
             </div>
             <div
               class="font-bold"
-              :class="remainingMinutes > 0 ? 'text-red-300' : 'text-green-300'"
-              :style="{ fontSize: `${20 - scrollProgress * 6}px` }"
+              :style="{
+                fontSize: `${20 - scrollProgress * 6}px`,
+                color: remainingMinutes > 0 ? 'var(--danger)' : 'var(--success)'
+              }"
             >
               {{ minutesToTime(remainingMinutes) }}
             </div>
           </div>
           <div class="flex flex-col items-center mt-auto absolute right-6 top-16" :style="{ opacity: (1 - scrollProgress*2) }">
-            <div class="text-indigo-300 text-xs mb-1">Payé</div>
-            <div class="font-bold" :style="{ fontSize: `${20 - scrollProgress * 6}px` }">
+            <div class="text-xs mb-1 text-[var(--accent)]">Payé</div>
+            <div
+              class="font-bold text-[var(--text-primary)]"
+              :style="{
+                fontSize: `${20 - scrollProgress * 6}px`
+              }"
+            >
               {{ totalPaid }}
             </div>
           </div>

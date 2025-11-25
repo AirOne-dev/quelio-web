@@ -97,12 +97,15 @@
 /* Global styles */
 @layer base {
   html, body {
-    @apply bg-gradient-to-br from-gray-900 to-gray-800;
+    background: linear-gradient(to bottom right, var(--bg-from), var(--bg-to));
+    color: var(--text-primary);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: background 0.3s ease, color 0.3s ease;
   }
 
   #app {
-    @apply bg-gradient-to-br from-gray-900 to-gray-800;
+    background: linear-gradient(to bottom right, var(--bg-from), var(--bg-to));
+    transition: background 0.3s ease;
   }
 
   /* Scrollbar styles */
@@ -112,33 +115,33 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--scrollbar-track);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--scrollbar-thumb);
     border-radius: 4px;
-    border: 2px solid rgba(0, 0, 0, 0);
+    border: 2px solid transparent;
     background-clip: padding-box;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.7);
+    opacity: 0.8;
   }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.1);
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
 
   /* Autofill styles */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus {
-    -webkit-text-fill-color: white;
-    -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.1) inset;
-    box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.1) inset;
+    -webkit-text-fill-color: var(--text-primary);
+    -webkit-box-shadow: 0 0 0px 1000px var(--card-bg) inset;
+    box-shadow: 0 0 0px 1000px var(--card-bg) inset;
     transition: background-color 5000s ease-in-out 0s;
   }
 

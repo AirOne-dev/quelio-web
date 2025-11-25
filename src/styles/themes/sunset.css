@@ -1,0 +1,21 @@
+:root {
+  /* Sunset - Gris chaud avec touches orangées */
+  --bg-from: #1f1d1a;
+  --bg-to: #141210;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-hover: rgba(255, 255, 255, 0.08);
+  --text-primary: #FEF7F0;
+  --text-secondary: rgba(254, 247, 240, 0.7);
+  --text-tertiary: rgba(254, 247, 240, 0.5);
+  --border: rgba(255, 255, 255, 0.1);
+  --accent: #F97316;
+  --accent-hover: #FB923C;
+  --accent-light: rgba(249, 115, 22, 0.1);
+  --accent-rgb: 249, 115, 22;
+  --danger: #FB923C;
+  --success: #FBBF24;
+  --warning: #FDE047;
+  --warning-rgb: 253, 224, 71;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --scrollbar-track: rgba(255, 255, 255, 0.05);
+}

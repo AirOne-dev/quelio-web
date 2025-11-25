@@ -1,0 +1,21 @@
+:root {
+  /* Midnight - Fond gris foncé élégant */
+  --bg-from: #1a1d29;
+  --bg-to: #13151d;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-hover: rgba(255, 255, 255, 0.08);
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: rgba(255, 255, 255, 0.5);
+  --border: rgba(255, 255, 255, 0.1);
+  --accent: #6366F1;
+  --accent-hover: #818CF8;
+  --accent-light: rgba(99, 102, 241, 0.1);
+  --accent-rgb: 99, 102, 241;
+  --danger: #818CF8;
+  --success: #A5B4FC;
+  --warning: #C4B5FD;
+  --warning-rgb: 196, 181, 253;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --scrollbar-track: rgba(255, 255, 255, 0.05);
+}

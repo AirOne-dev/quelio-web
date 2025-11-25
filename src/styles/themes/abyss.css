@@ -1,0 +1,21 @@
+:root {
+  /* Abyss - Noir pur avec accents bleus */
+  --bg-from: #000000;
+  --bg-to: #0a0a0a;
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-hover: rgba(255, 255, 255, 0.07);
+  --text-primary: #F9FAFB;
+  --text-secondary: rgba(249, 250, 251, 0.7);
+  --text-tertiary: rgba(249, 250, 251, 0.5);
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #3B82F6;
+  --accent-hover: #60A5FA;
+  --accent-light: rgba(59, 130, 246, 0.1);
+  --accent-rgb: 59, 130, 246;
+  --danger: #60A5FA;
+  --success: #93C5FD;
+  --warning: #BFDBFE;
+  --warning-rgb: 191, 219, 254;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --scrollbar-track: rgba(255, 255, 255, 0.03);
+}

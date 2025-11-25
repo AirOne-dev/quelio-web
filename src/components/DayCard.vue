@@ -61,17 +61,16 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
 <template>
   <div class="px-6">
     <div
-      class="day-card opacity-0 translate-y-5 animate-[slide-up_0.5s_ease-out_forwards] rounded-2xl overflow-hidden w-full max-w-md mx-auto relative"
+      class="day-card opacity-0 translate-y-5 animate-[slide-up_0.5s_ease-out_forwards] rounded-2xl overflow-hidden w-full max-w-md mx-auto relative border border-[var(--border)] backdrop-blur-[12px]"
       :class="[
         isDayCardHalfTransparent
-          ? 'border-r-[#222b38] border-b-[#222b38] border-t-white/10 border-l-white/10'
-          : 'bg-white/5 backdrop-blur-xl border border-white/10'
+          ? ''
+          : 'backdrop-blur-xl'
       ]"
       :style="{
         animationDelay: index * 0.1 + 's',
         opacity: !isDayCardHalfTransparent && isDayCardTransparent ? '0.3 !important' : 1,
-        background: isDayCardHalfTransparent ? 'linear-gradient(to bottom right, rgba(255, 255, 255, 0.05) 50%, #1b2332 50%)' : undefined,
-        backdropFilter: isDayCardHalfTransparent ? undefined : 'blur(12px)'
+        background: isDayCardHalfTransparent ? 'linear-gradient(to bottom right, var(--card-bg) 50%, rgba(0,0,0,0.2) 50%)' : 'var(--card-bg)'
       }"
     >
       <div @click="handleShowMore" class="p-6 cursor-pointer">
@@ -84,14 +83,13 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
             <div class="flex">
               <div
                 @click.stop="handleMarkAbsent(date)"
-                style="margin-top: 2px;"
-                class="w-6 h-6 p-1 mr-2 cursor-pointer hover:scale-110 active:scale-95 transition-transform"
+                class="w-6 h-6 p-1 mr-2 cursor-pointer hover:scale-110 active:scale-95 transition-transform mt-[2px]"
               >
                 <!-- Absent icon -->
                 <svg
                   v-if="missingDates.map((md) => md.split(' [-] ')[0]).includes(date)"
                   title="Marquer ce jour comme non travaillé"
-                  class="text-red-300 h-full w-full hover:text-red-200 transition-colors"
+                  class="h-full w-full hover:opacity-80 transition-opacity text-[var(--danger)]"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 640 512"
                 >
@@ -104,7 +102,7 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
                   v-else
                   title="Marquer ce jour comme travaillé"
                   xmlns="http://www.w3.org/2000/svg"
-                  class="text-indigo-300 h-full w-full hover:text-indigo-200 transition-colors"
+                  class="h-full w-full hover:opacity-80 transition-opacity text-[var(--accent)]"
                   viewBox="0 0 640 512"
                 >
                   <path fill="currentColor"
@@ -112,9 +110,9 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
                   />
                 </svg>
               </div>
-              <h2 class="text-xl font-semibold">{{ formatDate(date) }}</h2>
+              <h2 class="text-xl font-semibold text-[var(--text-primary)]">{{ formatDate(date) }}</h2>
             </div>
-            <div v-if="times" class="text-indigo-300 text-sm mt-1">
+            <div v-if="times" class="text-sm mt-1 text-[var(--accent)]">
               {{ getDayTotal(times) }}
             </div>
           </div>
@@ -122,7 +120,7 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
             <!-- Caret down icon -->
             <svg
               title="Afficher plus d'informations"
-              class="caret-icon text-white h-full w-full transition-transform duration-300"
+              class="caret-icon h-full w-full transition-transform duration-300 text-[var(--text-primary)]"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 320 512"
             >
@@ -135,39 +133,41 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
 
         <!-- Timeline -->
         <div v-if="isDayCardHalfTransparent || !isDayCardTransparent" class="relative">
-          <div class="timeline-container relative h-4 bg-white/10 rounded-lg">
+          <div class="timeline-container relative h-4 rounded-lg bg-[var(--border)]">
             <template v-if="times">
               <div
                 v-for="(block, idx) in getTimeBlocks(times)"
                 :key="idx"
-                class="absolute h-full bg-gradient-to-r from-indigo-600 to-indigo-500 transition-all duration-300 rounded-md z-10 pointer-events-none after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-r after:from-white/10 after:via-white/20 after:to-white/10 after:bg-[length:200%_100%] after:animate-[shine_3s_infinite] after:rounded-md"
-                :style="getBlockStyle(block)"
+                class="absolute h-full transition-all duration-300 rounded-md z-10 pointer-events-none after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-r after:from-white/10 after:via-white/20 after:to-white/10 after:bg-[length:200%_100%] after:animate-[shine_3s_infinite] after:rounded-md"
+                :style="{
+                  ...getBlockStyle(block),
+                  background: `linear-gradient(to right, var(--accent-hover), var(--accent))`
+                }"
               />
             </template>
             <template v-if="suggestedTimeBlocks">
               <div
                 v-for="(block, idx) in suggestedTimeBlocks"
                 :key="idx"
-                class="suggestedBlock border-2 absolute h-full transition-all duration-200 flex items-center rounded-md"
+                class="suggestedBlock border-2 absolute h-full transition-all duration-200 flex items-center rounded-md bg-[repeating-linear-gradient(110deg,#aaa,#aaa_2px,transparent_2px,transparent_6px)] border-[#aaa]"
                 :class="`${date}-${idx}` === selectedSuggestedBlock ? `rounded-r-none ${hasBeforeSelector(block, date, times) ? 'rounded-l-none' : ''}` : 'opacity-20'"
                 :style="getBlockStyle(block)"
-                style="background: repeating-linear-gradient(110deg,#aaa, #aaa 2px, transparent 2px, transparent 6px); border-color: #aaa;"
                 @click.stop="handleSelectSuggestedBlock(date, idx)"
               >
                 <div
                   v-if="`${date}-${idx}` === selectedSuggestedBlock && hasBeforeSelector(block, date, times)"
-                  class="absolute -left-0.5 w-2 h-6 rounded-full bg-white"
+                  class="absolute -left-0.5 w-2 h-6 rounded-full bg-[var(--text-primary)]"
                   @mousedown.stop="emit('start-resize-suggestion', $event, date, idx, 'start')"
                 />
                 <div
                   v-if="`${date}-${idx}` === selectedSuggestedBlock"
-                  class="absolute -right-0.5 w-2 h-6 rounded-full bg-white"
+                  class="absolute -right-0.5 w-2 h-6 rounded-full bg-[var(--text-primary)]"
                   @mousedown.stop="emit('start-resize-suggestion', $event, date, idx, 'end')"
                 />
               </div>
             </template>
           </div>
-          <div class="flex text-white/60 text-xs mt-2 relative">
+          <div class="flex text-xs mt-2 relative text-[var(--text-tertiary)]">
             <span
               v-for="hour in [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]"
               :key="hour"
@@ -186,13 +186,13 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
             <div
               v-for="(block, idx) in getTimeBlocks(times)"
               :key="idx"
-              class="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              class="flex items-center justify-between p-3 rounded-lg transition-colors bg-[var(--card-bg)] text-[var(--text-primary)] hover:bg-[var(--card-hover)]"
             >
               <div class="flex items-center space-x-3">
-                <div class="w-2 h-2 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600" />
+                <div class="w-2 h-2 rounded-full" :style="{ background: `linear-gradient(to right, var(--accent), var(--accent-hover))` }" />
                 <span>{{ block.start }} <span class="text-sm">→</span> {{ block.end }}</span>
               </div>
-              <div class="text-indigo-300">{{ block.duration }}</div>
+              <div class="text-[var(--accent)]">{{ block.duration }}</div>
             </div>
           </div>
         </div>

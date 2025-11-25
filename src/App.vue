@@ -3,7 +3,11 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import LoginScreen from './components/LoginScreen.vue'
 import Dashboard from './components/Dashboard.vue'
 import Loader from './components/Loader.vue'
+import { useTheme } from './composables/useTheme'
 import type { Credentials, ApiResponse, LogEntry } from './types'
+
+// Initialize theme
+const { loadTheme } = useTheme()
 
 // State
 const isAuthenticated = ref(false)
@@ -56,6 +60,9 @@ const login = async () => {
     isAuthenticated.value = true
 
     saveCredentials()
+
+    // Load theme after successful login
+    loadTheme()
   } catch (err) {
     error.value = "Erreur de connexion. Vérifiez vos identifiants."
     console.error('Erreur:', err)
@@ -73,10 +80,14 @@ const logout = () => {
 const saveCredentials = () => {
   const encodedCredentials = btoa(JSON.stringify(credentials.value))
   document.cookie = `quelio_credentials=${encodedCredentials}; max-age=2592000; path=/; Secure; SameSite=Strict`
+  // Save username to localStorage for theme persistence
+  localStorage.setItem('quelio_username', credentials.value.username)
 }
 
 const clearCredentials = () => {
   document.cookie = 'quelio_credentials=; max-age=0; path=/;'
+  // Clear username from localStorage
+  localStorage.removeItem('quelio_username')
 }
 
 const loadCredentials = () => {
@@ -88,6 +99,8 @@ const loadCredentials = () => {
       const encodedCredentials = credentialCookie.split('=')[1]
       const decodedCredentials = JSON.parse(atob(encodedCredentials))
       credentials.value = decodedCredentials
+      // Save username to localStorage for theme persistence
+      localStorage.setItem('quelio_username', decodedCredentials.username)
       return true
     } catch (err) {
       console.error('Erreur lors du chargement des credentials:', err)
@@ -100,8 +113,12 @@ const loadCredentials = () => {
 const autoLogin = async () => {
   if (loadCredentials()) {
     await login()
+    // Load theme after username is available
+    loadTheme()
   } else {
     loading.value = false
+    // Load default theme
+    loadTheme()
   }
 }
 

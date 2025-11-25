@@ -141,7 +141,7 @@ onMounted(() => {
   <div
     v-if="debugMode"
     id="debugConsole"
-    class="fixed z-[100] bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl flex flex-col"
+    class="fixed z-[9999] backdrop-blur-xl rounded-xl shadow-2xl flex flex-col bg-[rgba(17,24,39,0.95)] border border-[var(--border)]"
     :style="{
       left: `${position.x}px`,
       top: `${position.y}px`,
@@ -151,16 +151,16 @@ onMounted(() => {
   >
     <!-- Header (draggable) -->
     <div
-      class="flex items-center justify-between px-4 py-3 border-b border-white/10 cursor-move select-none bg-white/5"
+      class="flex items-center justify-between px-4 py-3 cursor-move select-none border-b border-[var(--border)] bg-[var(--card-bg)]"
       @mousedown="handleDragStart"
       @touchstart="handleDragStart"
     >
       <div class="flex items-center space-x-2">
         <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-        <span class="text-sm font-semibold text-white">Console Debug</span>
-        <span class="text-xs text-white/60">({{ logs.length }} logs)</span>
+        <span class="text-sm font-semibold text-[var(--text-primary)]">Console Debug</span>
+        <span class="text-xs text-[var(--text-tertiary)]">({{ logs.length }} logs)</span>
       </div>
-      <div class="text-xs text-white/40 select-none">Déplacer et redimensionner</div>
+      <div class="text-xs select-none text-[var(--text-tertiary)]">Déplacer et redimensionner</div>
     </div>
 
     <!-- Logs content -->
@@ -180,7 +180,7 @@ onMounted(() => {
       >
         <span class="opacity-60">[{{ log.type.toUpperCase() }}]</span> {{ log.message }}
       </div>
-      <div v-if="logs.length === 0" class="text-white/40 text-center py-8">
+      <div v-if="logs.length === 0" class="text-center py-8 text-[var(--text-tertiary)]">
         Aucun log pour le moment
       </div>
     </div>
@@ -191,7 +191,7 @@ onMounted(() => {
       @mousedown="handleResizeStart"
       @touchstart="handleResizeStart"
     >
-      <div class="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-white/30 group-hover:border-white/60 transition-colors" />
+      <div class="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 transition-colors border-[var(--text-tertiary)]" />
     </div>
   </div>
 </template>

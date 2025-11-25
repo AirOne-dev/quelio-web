@@ -80,7 +80,7 @@ watch(() => props.open, (newVal) => {
     <!-- Backdrop -->
     <div
       v-if="open"
-      class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
+      class="fixed inset-0 z-[9999] backdrop-blur-sm transition-opacity duration-300 bg-[rgba(0,0,0,0.4)]"
       :class="isAnimating || isClosing ? 'opacity-0' : 'opacity-100'"
       @click="handleClose"
     />
@@ -88,14 +88,19 @@ watch(() => props.open, (newVal) => {
     <!-- Drawer -->
     <div
       v-if="open"
-      class="fixed inset-x-0 bottom-0 z-50 flex flex-col transition-transform duration-[400ms]"
+      class="fixed inset-x-0 bottom-0 z-[9999] flex flex-col transition-transform duration-[400ms]"
       :style="{
         transform: isClosing ? 'translateY(100%)' : isAnimating ? 'translateY(100%)' : `translateY(${translateY}px)`,
         transitionTimingFunction: isClosing ? 'cubic-bezier(0.32, 0.72, 0, 1)' : 'cubic-bezier(0.32, 0.72, 0, 1)',
         transitionDuration: isDragging ? '0ms' : isClosing ? '500ms' : '400ms'
       }"
     >
-      <div class="absolute h-[50px] top-0 w-full bg-gradient-to-b from-transparent to-white/5">
+      <div
+        class="absolute h-[50px] top-0 w-full"
+        :style="{
+          background: 'linear-gradient(to bottom, transparent, var(--card-bg))'
+        }"
+      >
       </div>
       <!-- Drag handle area -->
       <div
@@ -108,11 +113,11 @@ watch(() => props.open, (newVal) => {
         @touchend="handleDragEnd"
         @mouseleave="handleDragEnd"
       >
-        <div class="w-12 h-1.5 rounded-full bg-white/30 backdrop-blur" />
+        <div class="w-12 h-1.5 rounded-full backdrop-blur bg-[var(--text-tertiary)]" />
       </div>
 
       <!-- Content -->
-      <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-t-2xl p-6 flex flex-col max-h-[85vh] overflow-y-auto">
+      <div class="backdrop-blur-xl rounded-t-2xl p-6 flex flex-col max-h-[85vh] overflow-y-auto bg-[var(--card-bg)] border-t border-x border-[var(--border)]">
         <slot />
       </div>
     </div>
