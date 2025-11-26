@@ -150,7 +150,7 @@ onBeforeUnmount(() => {
                 { '!text-[var(--text-tertiary)]': scrollProgress >= 0.5 },
               ]"
               :style="{
-                marginBottom: `calc(var(--spacing) * ${1 * (0.1 - scrollProgress)})`,
+                marginBottom: `calc(var(--spacing) * ${1 - 1.9 * scrollProgress})`,
               }"
             >
               Restant

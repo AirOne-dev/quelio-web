@@ -23,7 +23,7 @@ const handleThemeChange = (themeName: ThemeName) => {
     <!-- Theme Button (opens bottom sheet) -->
     <button
       @click="toggleDrawer"
-      class="w-full px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-between backdrop-blur-xl bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-primary)] cursor-pointer active:scale-[0.99]"
+      class="w-full px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-between bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-primary)] cursor-pointer active:scale-[0.99]"
     >
       <div class="flex items-center gap-3">
         <!-- Current theme color preview -->

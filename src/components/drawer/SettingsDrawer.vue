@@ -86,7 +86,7 @@ const changeHourObjective = async (event: Event) => {
         <!-- Logout Button -->
         <button
           @click="emit('logout')"
-          class="backdrop-blur-xl rounded-2xl p-4 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-all group mt-2 bg-[var(--card-bg)] border border-[var(--border)] hover:bg-[rgba(239,68,68,0.1)]"
+          class="backdrop-blur-xl rounded-2xl p-4 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-all group bg-[var(--card-bg)] border border-[var(--border)] hover:bg-[rgba(239,68,68,0.1)]"
         >
           <div
             class="w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-[rgba(239,68,68,0.2)]"
