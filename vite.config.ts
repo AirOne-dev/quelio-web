@@ -1,6 +1,21 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
+import type { Connect } from 'vite'
+
+// Middleware to redirect manifest.json and icon.svg to their PHP equivalents
+// This runs BEFORE the proxy, so we need to rewrite to .php but keep /api prefix
+function manifestIconRewrite(): Connect.NextHandleFunction {
+  return (req, res, next) => {
+    const url = req.url || ''
+    if (url.startsWith('/api/manifest.json')) {
+      req.url = url.replace('/api/manifest.json', '/api/manifest.php')
+    } else if (url.startsWith('/api/icon.svg')) {
+      req.url = url.replace('/api/icon.svg', '/api/icon.php')
+    }
+    next()
+  }
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -8,6 +23,15 @@ export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
+    {
+      name: 'manifest-icon-rewrite',
+      configureServer(server) {
+        server.middlewares.use(manifestIconRewrite())
+      },
+      configurePreviewServer(server) {
+        server.middlewares.use(manifestIconRewrite())
+      }
+    }
   ],
   server: {
     port: 9876,

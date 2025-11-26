@@ -149,19 +149,19 @@ const hasBeforeSelector = (block: TimeBlock, _date: string, times: string[] | un
               <div
                 v-for="(block, idx) in suggestedTimeBlocks"
                 :key="idx"
-                class="suggestedBlock border-2 absolute h-full transition-all duration-200 flex items-center rounded-md bg-[repeating-linear-gradient(110deg,#aaa,#aaa_2px,transparent_2px,transparent_6px)] border-[#aaa]"
+                class="suggestedBlock border-2 absolute h-full transition-all duration-200 flex items-center rounded-md bg-[repeating-linear-gradient(110deg,#aaa,#aaa_2px,transparent_2px,transparent_6px)] border-[#aaa] cursor-pointer"
                 :class="`${date}-${idx}` === selectedSuggestedBlock ? `rounded-r-none ${hasBeforeSelector(block, date, times) ? 'rounded-l-none' : ''}` : 'opacity-20'"
                 :style="getBlockStyle(block)"
                 @click.stop="handleSelectSuggestedBlock(date, idx)"
               >
                 <div
                   v-if="`${date}-${idx}` === selectedSuggestedBlock && hasBeforeSelector(block, date, times)"
-                  class="absolute -left-0.5 w-2 h-6 rounded-full bg-[var(--text-primary)]"
+                  class="absolute -left-0.5 w-2 h-6 rounded-full bg-[var(--text-primary)] cursor-ew-resize"
                   @mousedown.stop="emit('start-resize-suggestion', $event, date, idx, 'start')"
                 />
                 <div
                   v-if="`${date}-${idx}` === selectedSuggestedBlock"
-                  class="absolute -right-0.5 w-2 h-6 rounded-full bg-[var(--text-primary)]"
+                  class="absolute -right-0.5 w-2 h-6 rounded-full bg-[var(--text-primary)] cursor-ew-resize"
                   @mousedown.stop="emit('start-resize-suggestion', $event, date, idx, 'end')"
                 />
               </div>

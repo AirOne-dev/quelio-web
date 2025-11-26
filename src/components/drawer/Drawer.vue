@@ -1,78 +1,74 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
-interface Props {
-  open: boolean
-}
+const props = defineProps<{
+  open: boolean;
+}>();
+const emit = defineEmits<{
+  (e: "update:open", value: boolean): void;
+}>();
 
-interface Emits {
-  (e: 'update:open', value: boolean): void
-}
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-
-const isDragging = ref(false)
-const startY = ref(0)
-const currentY = ref(0)
-const translateY = ref(0)
-const isClosing = ref(false)
-const isAnimating = ref(false)
+const isDragging = ref(false),
+  startY = ref(0),
+  currentY = ref(0),
+  translateY = ref(0),
+  isClosing = ref(false),
+  isAnimating = ref(false);
 
 const handleClose = () => {
-  isClosing.value = true
-  // Wait for animation to complete before emitting close
-  setTimeout(() => {
-    emit('update:open', false)
-    isClosing.value = false
-  }, 300) // Match animation duration
-}
+    isClosing.value = true;
+    // Wait for animation to complete before emitting close
+    setTimeout(() => {
+      emit("update:open", false);
+      isClosing.value = false;
+    }, 300); // Match animation duration
+  },
+  handleDragStart = (e: TouchEvent | MouseEvent) => {
+    isDragging.value = true;
+    startY.value = "touches" in e ? e.touches[0].clientY : e.clientY;
+    currentY.value = startY.value;
+  },
+  handleDragMove = (e: TouchEvent | MouseEvent) => {
+    if (!isDragging.value) return;
 
-const handleDragStart = (e: TouchEvent | MouseEvent) => {
-  isDragging.value = true
-  startY.value = 'touches' in e ? e.touches[0].clientY : e.clientY
-  currentY.value = startY.value
-}
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    const deltaY = clientY - startY.value;
 
-const handleDragMove = (e: TouchEvent | MouseEvent) => {
-  if (!isDragging.value) return
+    // Only allow dragging down
+    if (deltaY > 0) {
+      translateY.value = deltaY;
+      currentY.value = clientY;
+    }
+  },
+  handleDragEnd = () => {
+    if (!isDragging.value) return;
 
-  const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
-  const deltaY = clientY - startY.value
+    isDragging.value = false;
 
-  // Only allow dragging down
-  if (deltaY > 0) {
-    translateY.value = deltaY
-    currentY.value = clientY
-  }
-}
+    // If dragged more than 150px, close the drawer
+    if (translateY.value > 150) {
+      handleClose();
+    }
 
-const handleDragEnd = () => {
-  if (!isDragging.value) return
-
-  isDragging.value = false
-
-  // If dragged more than 150px, close the drawer
-  if (translateY.value > 150) {
-    handleClose()
-  }
-
-  translateY.value = 0
-}
+    translateY.value = 0;
+  };
 
 // Reset translateY when drawer opens/closes
-watch(() => props.open, (newVal) => {
-  if (newVal) {
-    isAnimating.value = true
-    // Use requestAnimationFrame for instant visual update
-    requestAnimationFrame(() => {
-      isAnimating.value = false
-    })
-  } else {
-    translateY.value = 0
-    isClosing.value = false
+watch(
+  () => props.open,
+  (newVal) => {
+    if (newVal) {
+      isAnimating.value = true;
+      // Use requestAnimationFrame for instant visual update
+      requestAnimationFrame(() => {
+        isAnimating.value = false;
+      });
+    } else {
+      translateY.value = 0;
+      isClosing.value = false;
+    }
   }
-})
+);
 </script>
 
 <template>
@@ -80,7 +76,7 @@ watch(() => props.open, (newVal) => {
     <!-- Backdrop -->
     <div
       v-if="open"
-      class="fixed inset-0 z-[9999] backdrop-blur-sm transition-opacity duration-300 bg-[rgba(0,0,0,0.4)]"
+      class="fixed inset-0 z-[9999] backdrop-blur-sm transition-opacity duration-300 bg-[rgba(0,0,0,0.4)] cursor-pointer"
       :class="isAnimating || isClosing ? 'opacity-0' : 'opacity-100'"
       @click="handleClose"
     />
@@ -90,18 +86,23 @@ watch(() => props.open, (newVal) => {
       v-if="open"
       class="fixed inset-x-0 bottom-0 z-[9999] flex flex-col transition-transform duration-[400ms]"
       :style="{
-        transform: isClosing ? 'translateY(100%)' : isAnimating ? 'translateY(100%)' : `translateY(${translateY}px)`,
-        transitionTimingFunction: isClosing ? 'cubic-bezier(0.32, 0.72, 0, 1)' : 'cubic-bezier(0.32, 0.72, 0, 1)',
-        transitionDuration: isDragging ? '0ms' : isClosing ? '500ms' : '400ms'
+        transform: isClosing
+          ? 'translateY(100%)'
+          : isAnimating
+          ? 'translateY(100%)'
+          : `translateY(${translateY}px)`,
+        transitionTimingFunction: isClosing
+          ? 'cubic-bezier(0.32, 0.72, 0, 1)'
+          : 'cubic-bezier(0.32, 0.72, 0, 1)',
+        transitionDuration: isDragging ? '0ms' : isClosing ? '500ms' : '400ms',
       }"
     >
       <div
         class="absolute h-[50px] top-0 w-full"
         :style="{
-          background: 'linear-gradient(to bottom, transparent, var(--card-bg))'
+          background: 'linear-gradient(to bottom, transparent, var(--card-bg))',
         }"
-      >
-      </div>
+      ></div>
       <!-- Drag handle area -->
       <div
         class="flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing"
@@ -117,7 +118,9 @@ watch(() => props.open, (newVal) => {
       </div>
 
       <!-- Content -->
-      <div class="backdrop-blur-xl rounded-t-2xl p-6 flex flex-col max-h-[85vh] overflow-y-auto bg-[var(--card-bg)] border-t border-x border-[var(--border)]">
+      <div
+        class="backdrop-blur-xl rounded-t-2xl p-6 flex flex-col max-h-[85vh] overflow-y-auto bg-[var(--card-bg)] border-t border-x border-[var(--border)]"
+      >
         <slot />
       </div>
     </div>

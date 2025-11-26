@@ -130,10 +130,6 @@ const autoLogin = async () => {
   }
 }
 
-const changeDebugMode = (value: boolean) => {
-  debugMode.value = value
-  localStorage.setItem(`quelio_debug_mode_${credentials.value.username}`, JSON.stringify(value))
-}
 
 const addLog = (type: 'log' | 'warn' | 'error', args: unknown[]) => {
   const message = args.map(arg => {
@@ -154,12 +150,11 @@ const addLog = (type: 'log' | 'warn' | 'error', args: unknown[]) => {
 
 // Lifecycle hooks
 onMounted(() => {
-  autoLogin()
+  // Check URL for debug=1 parameter
+  const urlParams = new URLSearchParams(window.location.search)
+  debugMode.value = urlParams.get('debug') === '1'
 
-  const storedDebugMode = localStorage.getItem(`quelio_debug_mode_${credentials.value.username}`)
-  if (storedDebugMode) {
-    debugMode.value = JSON.parse(storedDebugMode)
-  }
+  autoLogin()
 
   // Override console methods for debug mode
   originalLog = console.log
@@ -213,7 +208,6 @@ onBeforeUnmount(() => {
       :logs="logs"
       @logout="logout"
       @refresh="autoLogin"
-      @update:debug-mode="changeDebugMode"
     />
   </div>
 </template>

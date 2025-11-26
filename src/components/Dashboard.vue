@@ -1,126 +1,122 @@
 <script setup lang="ts">
-import { toRef, onMounted } from 'vue'
-import DayCard from './DayCard.vue'
-import WeekStats from './WeekStats.vue'
-import OfflineBanner from './OfflineBanner.vue'
-import DebugConsole from './DebugConsole.vue'
-import SettingsDrawer from './drawer/SettingsDrawer.vue'
-import AbsenceDrawer from './drawer/AbsenceDrawer.vue'
-import { useLocalStorage } from '../composables/useLocalStorage'
-import { useAbsences } from '../composables/useAbsences'
-import { useWeekDays } from '../composables/useWeekDays'
-import { useTimeObjective } from '../composables/useTimeObjective'
-import { useDaysLeft } from '../composables/useDaysLeft'
-import { useSuggestions } from '../composables/useSuggestions'
-import { useDrawers } from '../composables/useDrawers'
-import type { ApiResponse, Credentials, LogEntry } from '../types'
+import { toRef, onMounted } from "vue";
+import DayCard from "./DayCard.vue";
+import WeekStats from "./WeekStats.vue";
+import OfflineBanner from "./OfflineBanner.vue";
+import DebugConsole from "./DebugConsole.vue";
+import SettingsDrawer from "./drawer/SettingsDrawer.vue";
+import AbsenceDrawer from "./drawer/AbsenceDrawer.vue";
+import { useLocalStorage } from "../composables/useLocalStorage";
+import { useAbsences } from "../composables/useAbsences";
+import { useWeekDays } from "../composables/useWeekDays";
+import { useTimeObjective } from "../composables/useTimeObjective";
+import { useDaysLeft } from "../composables/useDaysLeft";
+import { useSuggestions } from "../composables/useSuggestions";
+import { useDrawers } from "../composables/useDrawers";
+import type { ApiResponse, Credentials, LogEntry } from "../types";
 
-// Props
-interface Props {
-  data: ApiResponse
-  offline: boolean
-  credentials: Credentials
-  debugMode: boolean
-  logs: LogEntry[]
-}
+const props = defineProps<{
+    data: ApiResponse;
+    offline: boolean;
+    credentials: Credentials;
+    debugMode: boolean;
+    logs: LogEntry[];
+  }>(),
+  emit = defineEmits<{
+    (e: "logout"): void;
+    (e: "refresh"): void;
+  }>();
 
-// Emits
-interface Emits {
-  (e: 'logout'): void
-  (e: 'refresh'): void
-  (e: 'update:debug-mode', value: boolean): void
-}
+const dataRef = toRef(() => props.data),
+  { saveLocalStorage, loadLocalStorage } = useLocalStorage(props.credentials.username),
+  {
+    missingDates,
+    markAbsent,
+    removeAbsent,
+    loadMissingDates,
+    isDayCardTransparent,
+    isDayCardHalfTransparent,
+  } = useAbsences(saveLocalStorage, loadLocalStorage),
+  { days } = useWeekDays(dataRef, missingDates, saveLocalStorage),
+  {
+    minutesObjective,
+    remainingMinutes,
+    changeHourObjective,
+    loadObjective,
+  } = useTimeObjective(
+    dataRef,
+    missingDates,
+    toRef(() => null),
+    saveLocalStorage,
+    loadLocalStorage
+  ),
+  { daysLeft } = useDaysLeft(days, missingDates, remainingMinutes),
+  {
+    selectedSuggestedBlock,
+    suggestedTimeBlocks,
+    getCustomBorneForSuggestions,
+    startResizeSuggestion,
+  } = useSuggestions(
+    days,
+    daysLeft,
+    remainingMinutes,
+    saveLocalStorage,
+    loadLocalStorage
+  ),
+  {
+    showSettingsDrawer,
+    showAbsenceDrawer,
+    presenceDate,
+    toggleSettingsDrawer,
+    toggleAbsenceDrawer,
+    handleMarkAbsent,
+  } = useDrawers();
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-
-// Convert props to refs
-const dataRef = toRef(() => props.data)
-
-// Composables
-const { saveLocalStorage, loadLocalStorage } = useLocalStorage(props.credentials.username)
-
-const {
-  missingDates,
-  markAbsent,
-  removeAbsent,
-  loadMissingDates,
-  isDayCardTransparent,
-  isDayCardHalfTransparent
-} = useAbsences(saveLocalStorage, loadLocalStorage)
-
-const { days } = useWeekDays(dataRef, missingDates, saveLocalStorage)
-
-const {
-  minutesObjective,
-  remainingMinutes,
-  changeHourObjective,
-  loadObjective
-} = useTimeObjective(dataRef, missingDates, toRef(() => null), saveLocalStorage, loadLocalStorage)
-
-const { daysLeft } = useDaysLeft(days, missingDates, remainingMinutes)
-
-const {
-  selectedSuggestedBlock,
-  suggestedTimeBlocks,
-  getCustomBorneForSuggestions,
-  startResizeSuggestion
-} = useSuggestions(days, daysLeft, remainingMinutes, saveLocalStorage, loadLocalStorage)
-
-const {
-  showSettingsDrawer,
-  showAbsenceDrawer,
-  presenceDate,
-  toggleSettingsDrawer,
-  toggleAbsenceDrawer,
-  handleMarkAbsent
-} = useDrawers()
-
-// Methods
 const showMore = (event: MouseEvent) => {
-  const parent = (event.target as HTMLElement).closest('.day-card')
-  const content = parent?.querySelector('.time-blocks') as HTMLElement
+    const parent = (event.target as HTMLElement).closest(".day-card");
+    const content = parent?.querySelector(".time-blocks") as HTMLElement;
 
-  if (content && parent) {
-    if (content.style.height === '0px') {
-      const caretIcon = parent.querySelector('.caret-icon') as HTMLElement
-      if (caretIcon) caretIcon.style.transform = 'rotate(180deg)'
-      content.style.height = content.scrollHeight + 'px'
-    } else {
-      const caretIcon = parent.querySelector('.caret-icon') as HTMLElement
-      if (caretIcon) caretIcon.style.transform = 'rotate(0deg)'
-      content.style.height = '0px'
+    if (content && parent) {
+      if (content.style.height === "0px") {
+        const caretIcon = parent.querySelector(".caret-icon") as HTMLElement;
+        if (caretIcon) caretIcon.style.transform = "rotate(180deg)";
+        content.style.height = content.scrollHeight + "px";
+      } else {
+        const caretIcon = parent.querySelector(".caret-icon") as HTMLElement;
+        if (caretIcon) caretIcon.style.transform = "rotate(0deg)";
+        content.style.height = "0px";
+      }
     }
-  }
-}
-
-const changeDebugMode = (value: boolean) => {
-  emit('update:debug-mode', value)
-}
-
-const handleMarkAbsentAndClose = (date: string, section: 'day' | 'morning' | 'afternoon' = 'day') => {
-  markAbsent(date, section)
-  toggleAbsenceDrawer()
-}
+  },
+  handleMarkAbsentAndClose = (
+    date: string,
+    section: "day" | "morning" | "afternoon" = "day"
+  ) => {
+    markAbsent(date, section);
+    toggleAbsenceDrawer();
+  };
 
 // Lifecycle hooks
 onMounted(() => {
-  getCustomBorneForSuggestions()
-  loadMissingDates()
+  getCustomBorneForSuggestions();
+  loadMissingDates();
 
   // Load objective from API preferences if available, otherwise from localStorage
   if (props.data.preferences?.minutes_objective) {
-    changeHourObjective(props.data.preferences.minutes_objective)
+    changeHourObjective(props.data.preferences.minutes_objective);
   } else {
-    loadObjective()
+    loadObjective();
   }
 
-  document.addEventListener('click', (event) => {
-    if (selectedSuggestedBlock.value && !(event.target as HTMLElement).closest('.suggestedBlock')) {
-      selectedSuggestedBlock.value = null
+  document.addEventListener("click", (event) => {
+    if (
+      selectedSuggestedBlock.value &&
+      !(event.target as HTMLElement).closest(".suggestedBlock")
+    ) {
+      selectedSuggestedBlock.value = null;
     }
-  })
-})
+  });
+});
 </script>
 
 <template>
@@ -165,12 +161,10 @@ onMounted(() => {
     <SettingsDrawer
       :show="showSettingsDrawer"
       :minutes-objective="minutesObjective"
-      :debug-mode="debugMode"
       :username="credentials.username"
       @close="toggleSettingsDrawer"
       @logout="emit('logout')"
       @update:minutes-objective="changeHourObjective"
-      @update:debug-mode="changeDebugMode"
     />
 
     <!-- Mark absent modal -->

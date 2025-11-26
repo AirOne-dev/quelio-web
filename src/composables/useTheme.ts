@@ -80,6 +80,17 @@ export const themes: Record<ThemeName, Theme> = {
   }
 }
 
+// Background colors for each theme (for meta theme-color)
+const themeBackgrounds: Record<ThemeName, string> = {
+  midnight: '#1a1d29',
+  light: '#F9FAFB',
+  abyss: '#000000',
+  ocean: '#1e293b',
+  forest: '#1a1f1a',
+  sunset: '#1f1d1a',
+  lavender: '#1d1a24'
+}
+
 const currentTheme = ref<ThemeName>('midnight')
 let currentStyleElement: HTMLStyleElement | null = null
 
@@ -113,6 +124,39 @@ export function useTheme() {
       currentStyleElement.setAttribute('data-theme', themeName)
       currentStyleElement.textContent = cssText
       document.head.appendChild(currentStyleElement)
+
+      // Update meta theme-color for mobile browsers
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', themeBackgrounds[themeName])
+      }
+
+      // Get current theme colors
+      const themeColors = themes[themeName].colors
+      const background = themeBackgrounds[themeName]
+
+      // Remove # from colors for URL params
+      const primary = themeColors.primary.replace('#', '')
+      const secondary = themeColors.secondary.replace('#', '')
+      const bg = background.replace('#', '')
+
+      // Update manifest link with color parameters
+      const manifestLink = document.querySelector('#manifest-link') as HTMLLinkElement
+      if (manifestLink) {
+        manifestLink.href = `./api/manifest.json?primary=${primary}&secondary=${secondary}&background=${bg}`
+      }
+
+      // Update Apple Touch Icon with color parameters
+      const appleIconLink = document.querySelector('#apple-icon-link') as HTMLLinkElement
+      if (appleIconLink) {
+        appleIconLink.href = `./api/icon.svg?primary=${primary}&secondary=${secondary}`
+      }
+
+      // Update favicon with color parameters
+      const faviconLink = document.querySelector('#favicon-link') as HTMLLinkElement
+      if (faviconLink) {
+        faviconLink.href = `./api/icon.svg?primary=${primary}&secondary=${secondary}`
+      }
 
       // Sauvegarder dans l'API et localStorage
       const username = localStorage.getItem('quelio_username')

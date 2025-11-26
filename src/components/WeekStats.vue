@@ -1,36 +1,32 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 
-interface Props {
+defineProps<{
   totalEffective: string;
   totalPaid: string;
   remainingMinutes: number;
-}
-
-interface Emits {
+}>();
+const emit = defineEmits<{
   (e: "refresh"): void;
   (e: "openSettings"): void;
-}
-
-defineProps<Props>();
-const emit = defineEmits<Emits>();
+}>();
 
 const scrollProgress = ref(0);
 
 const minutesToTime = (minutes: number): string => {
-  const hours = Math.floor(Math.abs(minutes) / 60);
-  const mins = Math.abs(minutes) % 60;
-  const sign = minutes < 0 ? "-" : "";
-  return `${sign}${hours}:${mins.toString().padStart(2, "0")}`;
-};
+    const hours = Math.floor(Math.abs(minutes) / 60);
+    const mins = Math.abs(minutes) % 60;
+    const sign = minutes < 0 ? "-" : "";
+    return `${sign}${hours}:${mins.toString().padStart(2, "0")}`;
+  },
+  handleScroll = () => {
+    const appElement = document.getElementById("app");
+    if (!appElement) return;
 
-const handleScroll = () => {
-  const appElement = document.getElementById("app");
-  if (!appElement) return;
-
-  const scrollTop = appElement.scrollTop;
-  scrollProgress.value = Math.min(scrollTop / 100, 1);
-};
+    const scrollTop = appElement.scrollTop;
+    const r = Math.min(scrollTop / 100, 1);
+    scrollProgress.value = r <= 0 ? 0 : r;
+  };
 
 onMounted(() => {
   const appElement = document.getElementById("app");
@@ -48,36 +44,33 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div
-    class="fixed top-0 left-0 right-0 z-40 pointer-events-none pt-6"
-  >
+  <div class="fixed top-0 left-0 right-0 z-40 pointer-events-none pt-6">
     <!-- fond gradient blur derrière la barre -->
     <div
-      class="absolute top-0 w-full backdrop-blur-[24px]"
+      class="absolute top-0 w-full"
       :style="{
         opacity: scrollProgress,
         height: 'calc(100% + calc(var(--spacing) * 12))',
-        mask: 'linear-gradient(black, black, transparent)'
+        mask: 'linear-gradient(black, black, transparent)',
+        backdropFilter: 'blur(24px)',
       }"
-    >
-    </div>
+    ></div>
 
     <div
       class="px-6 w-full"
-      :style="{
-        paddingInline: `calc(var(--spacing) * ${12 - scrollProgress * 6})`,
-      }"
+      :style="{ paddingInline: `calc(var(--spacing) * ${12 - scrollProgress * 6})` }"
     >
       <div
-        class="opacity-0 px-[24px] py-4 animate-[fade-in_0.5s_ease-out_0.3s_forwards] backdrop-blur-xl rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto min-w-[255px] bg-[var(--card-bg)] border border-[var(--border)]"
+        class="opacity-0 px-[24px] py-4 animate-[fade-in_0.5s_ease-out_0.3s_forwards] backdrop-blur-xl rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto min-w-[255px] bg-[var(--card-bg)] border border-1 border-[var(--border)]"
       >
         <!-- Header avec titre et icônes -->
         <div class="flex justify-between items-center">
           <h1
-            class="font-bold tracking-tight flex items-center text-[var(--text-primary)]"
+            class="font-bold tracking-tight flex items-center"
             :style="{
               fontSize: `${24 - scrollProgress * 6}px`,
-              lineHeight: '1.2'
+              lineHeight: '1.2',
+              color: 'var(--text-primary)',
             }"
           >
             <span>Ma semaine</span>
@@ -87,7 +80,8 @@ onBeforeUnmount(() => {
             >
               <svg
                 title="Actualiser vos horaires"
-                class="w-full h-full hover:opacity-80 transition-opacity text-[var(--accent)]"
+                class="w-full h-full hover:opacity-80 transition-opacity"
+                :style="{ color: 'var(--accent)' }"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
               >
@@ -105,7 +99,8 @@ onBeforeUnmount(() => {
             >
               <svg
                 title="Réglages"
-                class="w-full h-full hover:opacity-80 transition-opacity text-[var(--accent)]"
+                class="w-full h-full hover:opacity-80 transition-opacity"
+                :style="{ color: 'var(--accent)' }"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
               >
@@ -121,58 +116,68 @@ onBeforeUnmount(() => {
         <!-- Stats Grid -->
         <div
           class="grid grid-cols-3 gap-4"
-          :style="{
-            height:
-              `min(${((1 - scrollProgress) / 0.7) * 70}px, 70px)`,
-          }"
+          :style="{ height: `min(${((1 - scrollProgress) / 0.7) * 70}px, 70px)` }"
         >
-          <div class="flex flex-col items-center mt-auto absolute left-6 top-16" :style="{ opacity: (1 - scrollProgress*2) }">
-            <div class="text-xs mb-1 text-[var(--accent)]">Effectif</div>
+          <div
+            class="flex flex-col items-center mt-auto absolute left-6 top-16"
+            :style="{ opacity: 1 - scrollProgress * 1.5 }"
+          >
+            <div
+              class="text-xs mb-1 text-[var(--accent)]"
+              :style="{ fontSize: `${12 - scrollProgress * 8}px` }"
+            >
+              Effectif
+            </div>
             <div
               class="font-bold text-[var(--text-primary)]"
-              :style="{
-                fontSize: `${20 - scrollProgress * 6}px`
-              }"
+              :style="{ fontSize: `${20 - scrollProgress * 16}px` }"
             >
               {{ totalEffective }}
             </div>
           </div>
           <div
-            class="flex flex-col items-center mt-auto absolute space-y-1"
+            class="flex flex-col items-center mt-auto absolute space-y-1 translate-x-1/2"
             :style="{
               top: `calc(var(--spacing) * ${16 * (1 - scrollProgress)})`,
-              marginTop: `${scrollProgress*12}px`,
+              marginTop: `${scrollProgress * 12}px`,
               right: `${50 * (1 - scrollProgress)}%`,
-              marginRight: `${scrollProgress*85}px`,
-              transform: 'translateX(50%)'
+              marginRight: `${scrollProgress * 85}px`,
             }"
           >
             <div
-              class="text-xs transition-colors"
+              :class="[
+                'text-xs transition-colors text-[var(--accent)]',
+                { '!text-[var(--text-tertiary)]': scrollProgress >= 0.5 },
+              ]"
               :style="{
                 marginBottom: `calc(var(--spacing) * ${1 * (0.1 - scrollProgress)})`,
-                color: scrollProgress >= 0.5 ? 'var(--text-tertiary)' : 'var(--accent)'
               }"
             >
               Restant
             </div>
             <div
-              class="font-bold"
-              :style="{
-                fontSize: `${20 - scrollProgress * 6}px`,
-                color: remainingMinutes > 0 ? 'var(--danger)' : 'var(--success)'
-              }"
+              :class="[
+                'font-bold text-[var(--success)]',
+                { '!text-[var(--danger)]': remainingMinutes > 0 },
+              ]"
+              :style="{ fontSize: `${20 - scrollProgress * 6}px` }"
             >
               {{ minutesToTime(remainingMinutes) }}
             </div>
           </div>
-          <div class="flex flex-col items-center mt-auto absolute right-6 top-16" :style="{ opacity: (1 - scrollProgress*2) }">
-            <div class="text-xs mb-1 text-[var(--accent)]">Payé</div>
+          <div
+            class="flex flex-col items-center mt-auto absolute right-6 top-16"
+            :style="{ opacity: 1 - scrollProgress * 1.5 }"
+          >
+            <div
+              class="text-xs mb-1 text-[var(--accent)]"
+              :style="{ fontSize: `${12 - scrollProgress * 8}px` }"
+            >
+              Payé
+            </div>
             <div
               class="font-bold text-[var(--text-primary)]"
-              :style="{
-                fontSize: `${20 - scrollProgress * 6}px`
-              }"
+              :style="{ fontSize: `${20 - scrollProgress * 16}px` }"
             >
               {{ totalPaid }}
             </div>
