@@ -35,6 +35,8 @@ const updateAppScale = (progress: number) => {
   };
 
 const handleClose = () => {
+    if (isClosing.value) return; // Prevent multiple close calls
+
     isClosing.value = true;
     const appElement = document.getElementById("app");
 
@@ -50,7 +52,7 @@ const handleClose = () => {
     // Wait for animation to complete before emitting close
     setTimeout(() => {
       emit("update:open", false);
-      isClosing.value = false;
+      // Cleanup will be handled by the watcher
     }, 500); // Match animation duration
   },
   handleDragStart = (e: TouchEvent | MouseEvent) => {
@@ -107,7 +109,7 @@ const handleClose = () => {
 // Reset translateY when drawer opens/closes and add scale effect to #app
 watch(
   () => props.open,
-  (newVal) => {
+  (newVal, oldVal) => {
     const appElement = document.getElementById("app");
 
     if (newVal) {
@@ -127,19 +129,36 @@ watch(
       requestAnimationFrame(() => {
         isAnimating.value = false;
       });
-    } else {
-      // Decrement drawer count
-      (window as any).__drawerCount--;
+    } else if (oldVal && !isClosing.value) {
+      // If closing from parent without handleClose being called, trigger close animation
+      isClosing.value = true;
 
-      translateY.value = 0;
-      isClosing.value = false;
-      // Remove scale effect from #app only if no more drawers are open
-      if ((window as any).__drawerCount === 0) {
-        shouldShowBackdrop.value = false;
+      // Only update scale if this will be the last drawer closing
+      if ((window as any).__drawerCount === 1) {
         if (appElement) {
           appElement.style.transition = "transform 500ms cubic-bezier(0.32, 0.72, 0, 1), border-radius 500ms cubic-bezier(0.32, 0.72, 0, 1)";
         }
-        updateAppScale(1); // Scale to 1
+        updateAppScale(1); // Scale back to 1
+      }
+
+      // Wait for animation to complete before cleaning up
+      setTimeout(() => {
+        (window as any).__drawerCount--;
+        translateY.value = 0;
+        isClosing.value = false;
+
+        if ((window as any).__drawerCount === 0) {
+          shouldShowBackdrop.value = false;
+        }
+      }, 500);
+    } else if (!newVal && isClosing.value) {
+      // Already closing via handleClose, just clean up
+      (window as any).__drawerCount--;
+      translateY.value = 0;
+      isClosing.value = false;
+
+      if ((window as any).__drawerCount === 0) {
+        shouldShowBackdrop.value = false;
       }
     }
   }
@@ -150,7 +169,7 @@ watch(
   <Teleport to="body">
     <!-- Backdrop - only render for the first drawer -->
     <div
-      v-if="open"
+      v-if="open || isClosing"
       :class="[
         'fixed inset-0 z-[9999] transition-opacity duration-300 cursor-pointer',
         shouldShowBackdrop && 'bg-[rgba(0,0,0,0.4)]',
@@ -161,7 +180,7 @@ watch(
 
     <!-- Drawer -->
     <div
-      v-if="open"
+      v-if="open || isClosing"
       class="fixed inset-x-0 bottom-0 z-[9999] flex flex-col transition-transform duration-[400ms] cursor-grab active:cursor-grabbing"
       :style="{
         transform: isClosing
