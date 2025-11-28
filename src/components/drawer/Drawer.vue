@@ -77,7 +77,9 @@ const handleClose = () => {
 
       // Calculate progress based on drag distance (max 300px for full scale)
       const progress = Math.min(deltaY / 300, 1);
-      updateAppScale(progress);
+      if ((window as any).__drawerCount === 1) {
+        updateAppScale(progress);
+      }
     }
   },
   handleDragEnd = () => {
