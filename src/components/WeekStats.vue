@@ -11,7 +11,10 @@ const emit = defineEmits<{
   (e: "openSettings"): void;
 }>();
 
-const scrollProgress = ref(0);
+const lastScrollTop = ref(0);
+const lastDirectionChangeScrollTop = ref(0);
+const currentDirection = ref<'up' | 'down' | null>(null);
+const state = ref<'open' | 'closed'>('open');
 
 const minutesToTime = (minutes: number): string => {
     const hours = Math.floor(Math.abs(minutes) / 60);
@@ -19,13 +22,34 @@ const minutesToTime = (minutes: number): string => {
     const sign = minutes < 0 ? "-" : "";
     return `${sign}${hours}:${mins.toString().padStart(2, "0")}`;
   },
-  handleScroll = () => {
-    const appElement = document.getElementById("app");
-    if (!appElement) return;
+  handleScroll = (e) => {
+    if (!e.target) return;
 
-    const scrollTop = appElement.scrollTop;
-    const r = Math.min(scrollTop / 100, 1);
-    scrollProgress.value = r <= 0 ? 0 : r;
+    const scrollTop = e.target.scrollTop;
+    const direction = scrollTop > lastScrollTop.value ? 'down' : 'up';
+    
+    // Vérifier si la direction a changé
+    if (currentDirection.value !== direction) {
+      lastDirectionChangeScrollTop.value = lastScrollTop.value;
+      currentDirection.value = direction;
+    }
+    
+    // Calculer l'offset depuis le dernier changement de direction
+    const offsetSinceDirectionChange = Math.abs(scrollTop - lastDirectionChangeScrollTop.value);
+    
+    if (scrollTop <= 30) {
+      state.value = 'open';
+    } else {
+      if (direction === 'up' && offsetSinceDirectionChange >= 30) {
+        state.value = 'open';
+      }
+      if (direction === 'down' && offsetSinceDirectionChange >= 30) {
+        state.value = 'closed'
+      }
+    }
+
+    // Mettre à jour le dernier scrollTop
+    lastScrollTop.value = scrollTop;
   };
 
 onMounted(() => {
@@ -47,18 +71,15 @@ onBeforeUnmount(() => {
   <div class="fixed top-0 left-0 right-0 z-40 pointer-events-none pt-6">
     <!-- fond gradient blur derrière la barre -->
     <div
-      class="absolute top-0 w-full"
-      :style="{
-        opacity: scrollProgress,
-        height: 'calc(100% + calc(var(--spacing) * 12))',
-        mask: 'linear-gradient(black, black, transparent)',
-        backdropFilter: 'blur(24px)',
-      }"
+      class="absolute top-0 w-full h-[calc(100%_+_calc(var(--spacing)_*_12))] backdrop-blur-xl"
+      :style="{ mask: 'linear-gradient(black, black, transparent)' }"
     ></div>
 
     <div
-      class="px-6 w-full"
-      :style="{ paddingInline: `calc(var(--spacing) * ${12 - scrollProgress * 6})` }"
+      :class="[
+        'px-6 w-full transition-all duration-500',
+        { '!px-12': state === 'open' },
+      ]"
     >
       <div
         class="opacity-0 px-[24px] py-4 animate-[fade-in_0.5s_ease-out_0.3s_forwards] backdrop-blur-xl rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto min-w-[255px] bg-[var(--card-bg)] border border-1 border-[var(--border)]"
@@ -66,12 +87,10 @@ onBeforeUnmount(() => {
         <!-- Header avec titre et icônes -->
         <div class="flex justify-between items-center">
           <h1
-            class="font-bold tracking-tight flex items-center"
-            :style="{
-              fontSize: `${24 - scrollProgress * 6}px`,
-              lineHeight: '1.2',
-              color: 'var(--text-primary)',
-            }"
+            :class="[
+              'font-bold tracking-tight flex items-center text-[var(--text-primary)] heading-[1.2] text-[18px] transition-all duration-500',
+              { '!text-[24px]': state === 'open' },
+            ]"
           >
             <span>Ma semaine</span>
             <div
@@ -115,69 +134,82 @@ onBeforeUnmount(() => {
 
         <!-- Stats Grid -->
         <div
-          class="grid grid-cols-3 gap-4"
-          :style="{ height: `min(${((1 - scrollProgress) / 0.7) * 70}px, 70px)` }"
+          :class="[
+            'grid grid-cols-3 gap-4 h-0 transition-all duration-500',
+            { '!h-[70px]': state === 'open' },
+          ]"
         >
           <div
-            class="flex flex-col items-center mt-auto absolute left-6 top-16"
-            :style="{ opacity: 1 - scrollProgress * 1.5 }"
+            :class="[
+              'flex flex-col items-center mt-auto absolute left-6 top-16 opacity-0 transition-all duration-300',
+              {
+                '!opacity-100': state === 'open',
+                'delay-200': state === 'open'
+              },
+            ]"
           >
             <div
-              class="text-xs mb-1 text-[var(--accent)]"
-              :style="{ fontSize: `${12 - scrollProgress * 8}px` }"
+              :class="[
+                'text-[4px] mb-1 text-[var(--accent)] transition-all duration-500',
+                { '!text-[12px]': state === 'open' },
+              ]"
             >
               Effectif
             </div>
             <div
-              class="font-bold text-[var(--text-primary)]"
-              :style="{ fontSize: `${20 - scrollProgress * 16}px` }"
+              :class="[
+                'text-[4px] font-bold text-[var(--text-primary)] transition-all duration-500',
+                { '!text-[20px]': state === 'open' }
+              ]"
             >
               {{ totalEffective }}
             </div>
           </div>
           <div
-            class="flex flex-col items-center mt-auto absolute space-y-1 translate-x-1/2"
-            :style="{
-              top: `calc(var(--spacing) * ${16 * (1 - scrollProgress)})`,
-              marginTop: `${scrollProgress * 12}px`,
-              right: `${50 * (1 - scrollProgress)}%`,
-              marginRight: `${scrollProgress * 85}px`,
-            }"
+            :class="[
+              'flex flex-col items-center absolute space-y-1 translate-x-1/2 top-0 right-0 mr-[85px] mt-[12px] transition-all duration-500',
+              { '!top-[65px] !mt-0 !right-1/2 !mr-0': state === 'open' },
+            ]"
           >
             <div
               :class="[
-                'text-xs transition-colors text-[var(--accent)]',
-                { '!text-[var(--text-tertiary)]': scrollProgress >= 0.5 },
+                'text-xs transition-all duration-500 text-[var(--text-tertiary)] mb-[-3.6px]',
+                { '!text-[var(--accent)] !mb-[4px]': state === 'open' },
               ]"
-              :style="{
-                marginBottom: `calc(var(--spacing) * ${1 - 1.9 * scrollProgress})`,
-              }"
             >
               Restant
             </div>
             <div
               :class="[
-                'font-bold text-[var(--success)]',
-                { '!text-[var(--danger)]': remainingMinutes > 0 },
+                'font-bold text-[var(--success)] transition-all duration-500 text-[14px]',
+                {
+                  '!text-[var(--danger)]': remainingMinutes > 0,
+                  '!text-[20px]': state === 'open',
+                },
               ]"
-              :style="{ fontSize: `${20 - scrollProgress * 6}px` }"
             >
               {{ minutesToTime(remainingMinutes) }}
             </div>
           </div>
           <div
-            class="flex flex-col items-center mt-auto absolute right-6 top-16"
-            :style="{ opacity: 1 - scrollProgress * 1.5 }"
+            :class="[
+              'flex flex-col items-center mt-auto absolute right-6 top-16 opacity-0 transition-all duration-300',
+              { '!opacity-100 delay-200': state === 'open' },
+            ]"
           >
             <div
-              class="text-xs mb-1 text-[var(--accent)]"
-              :style="{ fontSize: `${12 - scrollProgress * 8}px` }"
+              :class="[
+                'text-[4px] mb-1 text-[var(--accent)] transition-all duration-500',
+                { '!text-[12px]': state === 'open' },
+              ]"
             >
               Payé
             </div>
             <div
-              class="font-bold text-[var(--text-primary)]"
-              :style="{ fontSize: `${20 - scrollProgress * 16}px` }"
+              :class="[
+                'text-[4px] font-bold text-[var(--text-primary)] transition-all duration-500',
+                { '!text-[20px]': state === 'open' },
+              ]"
             >
               {{ totalPaid }}
             </div>
