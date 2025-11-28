@@ -22,10 +22,10 @@ const minutesToTime = (minutes: number): string => {
     const sign = minutes < 0 ? "-" : "";
     return `${sign}${hours}:${mins.toString().padStart(2, "0")}`;
   },
-  handleScroll = (e) => {
+  handleScroll = (e: Event) => {
     if (!e.target) return;
 
-    const scrollTop = e.target.scrollTop;
+    const scrollTop = (e.target as HTMLElement).scrollTop;
     const direction = scrollTop > lastScrollTop.value ? 'down' : 'up';
     
     // Vérifier si la direction a changé
