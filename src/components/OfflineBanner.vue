@@ -5,9 +5,9 @@ defineProps<{
 </script>
 
 <template>
-  <div v-if="offline" class="fixed top-0 inset-x-0 z-[9999]">
+  <div v-if="offline" class="px-6">
     <div
-      class="backdrop-blur text-sm bg-[rgba(var(--warning-rgb),0.2)] text-[var(--warning)] border-b border-[rgba(var(--warning-rgb),0.4)]"
+      class="w-full max-w-md mx-auto rounded-2xl text-sm bg-[rgba(var(--warning-rgb),0.2)] text-[var(--warning)] border border-[rgba(var(--warning-rgb),0.4)]"
     >
       <div class="max-w-md mx-auto px-4 py-2 flex items-center gap-2">
         <svg

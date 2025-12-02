@@ -121,9 +121,8 @@ onMounted(() => {
 
 <template>
   <!-- Offline banner -->
-  <OfflineBanner :offline="offline" />
 
-  <div class="pb-40" :class="offline ? 'pt-24' : ''">
+  <div class="min-h-screen">
     <!-- Header Stats -->
     <WeekStats
       :total-effective="data.total_effective"
@@ -134,7 +133,9 @@ onMounted(() => {
     />
 
     <!-- Days -->
-    <div class="space-y-6 px-6 mt-40">
+    <div class="space-y-6 px-6 pt-47 pb-40">
+      <OfflineBanner :offline="offline" />
+
       <DayCard
         v-for="(times, date, index) in days"
         :key="date"

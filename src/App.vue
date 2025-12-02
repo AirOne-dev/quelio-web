@@ -181,29 +181,27 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div>
-    <!-- Loader -->
-    <Loader v-if="loading" />
+  <!-- Loader -->
+  <Loader v-if="loading" />
 
-    <!-- Login Screen -->
-    <LoginScreen
-      v-if="!isAuthenticated && !loading"
-      v-model:credentials="credentials"
-      :error="error"
-      :loading="loading"
-      @login="login"
-    />
+  <!-- Login Screen -->
+  <LoginScreen
+    v-else-if="!isAuthenticated"
+    v-model:credentials="credentials"
+    :error="error"
+    :loading="loading"
+    @login="login"
+  />
 
-    <!-- Main App -->
-    <Dashboard
-      v-if="isAuthenticated && !loading"
-      :data="data!"
-      :offline="offline"
-      :credentials="credentials"
-      :debug-mode="debugMode"
-      :logs="logs"
-      @logout="logout"
-      @refresh="autoLogin"
-    />
-  </div>
+  <!-- Main App -->
+  <Dashboard
+    v-else
+    :data="data!"
+    :offline="offline"
+    :credentials="credentials"
+    :debug-mode="debugMode"
+    :logs="logs"
+    @logout="logout"
+    @refresh="autoLogin"
+  />
 </template>

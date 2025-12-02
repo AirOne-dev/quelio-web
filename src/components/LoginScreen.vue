@@ -28,7 +28,7 @@ const updateUsername = (event: Event) => {
   <div class="min-h-screen flex flex-col justify-between p-6 pb-8">
     <!-- Top section with logo and title -->
     <div
-      class="flex-1 flex flex-col justify-center items-center opacity-0 translate-y-5 animate-[fade-in-up_0.6s_ease-out_forwards]"
+      class="flex-1 flex flex-col justify-center items-center opacity-0 translate-y-5"
     >
       <!-- App Icon -->
       <div class="mb-8 relative">
@@ -181,7 +181,7 @@ const updateUsername = (event: Event) => {
     </div>
 
     <!-- Bottom info text -->
-    <div class="text-center opacity-0 animate-[fade-in_0.6s_ease-out_0.3s_forwards]">
+    <div class="text-center opacity-0">
       <p class="text-sm text-[var(--text-tertiary)]">Connexion sécurisée avec Kelio</p>
     </div>
   </div>

@@ -73,7 +73,7 @@ const formatDate = (date: string) => {
 <template>
   <div class="px-6">
     <div
-      class="day-card opacity-0 translate-y-5 animate-[slide-up_0.5s_ease-out_forwards] rounded-2xl overflow-hidden w-full max-w-md mx-auto relative border border-[var(--border)] backdrop-blur-[12px]"
+      class="day-card opacity-0 rounded-2xl overflow-hidden w-full max-w-md mx-auto relative border border-[var(--border)]"
       :class="[isDayCardHalfTransparent ? '' : 'backdrop-blur-xl']"
       :style="{
         animationDelay: index * 0.1 + 's',

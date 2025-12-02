@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { useDrawers } from "../../composables/useDrawers";
 
 const props = defineProps<{
   open: boolean;
@@ -14,23 +15,26 @@ const isDragging = ref(false),
   translateY = ref(0),
   isClosing = ref(false),
   isAnimating = ref(false),
-  shouldShowBackdrop = ref(false);
+  shouldShowBackdrop = ref(false),
+  { drawerCount, setDrawerCount } = useDrawers();
 
-// Global counter for open drawers
-if (!(window as any).__drawerCount) {
-  (window as any).__drawerCount = 0;
-}
-
-const updateAppScale = (progress: number) => {
-    // progress: 0 = drawer open (scale 0.98), 1 = drawer closed (scale 1)
+const updateAppScale = (progress: number, reset: boolean = false) => {
+    // progress: 0 = drawer open (scale 0.95), 1 = drawer closed (scale 1)
     const appElement = document.getElementById("app");
     if (appElement) {
-      const scale = 0.95 + (0.05 * progress); // 0.98 to 1
+      const scale = 0.95 + (0.05 * progress); // 0.95 to 1
       const borderRadius = 12 * (1 - progress); // 12px to 0px
 
       appElement.style.transform = `scale(${scale})`;
       appElement.style.borderRadius = `${borderRadius}px`;
       appElement.style.overflow = progress < 1 ? "hidden" : "";
+      if (reset) {
+        setTimeout(() => {
+          appElement.style.transform = '';
+          appElement.style.borderRadius = '';
+          appElement.style.overflow = '';
+        }, 500);
+      }
     }
   };
 
@@ -42,11 +46,11 @@ const handleClose = () => {
 
     // Only update scale if this will be the last drawer closing
     // We need to check if count will be 0 after this drawer closes
-    if ((window as any).__drawerCount === 1) {
+    if (drawerCount.value === 1) {
       if (appElement) {
         appElement.style.transition = "transform 500ms cubic-bezier(0.32, 0.72, 0, 1), border-radius 500ms cubic-bezier(0.32, 0.72, 0, 1)";
       }
-      updateAppScale(1); // Scale back to 1
+      updateAppScale(1, true); // Scale back to 1
     }
 
     // Wait for animation to complete before emitting close
@@ -79,7 +83,7 @@ const handleClose = () => {
 
       // Calculate progress based on drag distance (max 300px for full scale)
       const progress = Math.min(deltaY / 300, 1);
-      if ((window as any).__drawerCount === 1) {
+      if (drawerCount.value === 1) {
         updateAppScale(progress);
       }
     }
@@ -114,16 +118,16 @@ watch(
 
     if (newVal) {
       // Increment drawer count
-      (window as any).__drawerCount++;
+      setDrawerCount(drawerCount.value + 1);
 
       isAnimating.value = true;
       // Add scale effect to #app only if this is the first drawer
-      if ((window as any).__drawerCount === 1) {
+      if (drawerCount.value === 1) {
         shouldShowBackdrop.value = true;
         if (appElement) {
           appElement.style.transition = "transform 400ms cubic-bezier(0.32, 0.72, 0, 1), border-radius 400ms cubic-bezier(0.32, 0.72, 0, 1)";
         }
-        updateAppScale(0); // Scale to 0.98
+        updateAppScale(0); // Scale to 0.95
       }
       // Use requestAnimationFrame for instant visual update
       requestAnimationFrame(() => {
@@ -134,30 +138,30 @@ watch(
       isClosing.value = true;
 
       // Only update scale if this will be the last drawer closing
-      if ((window as any).__drawerCount === 1) {
+      if (drawerCount.value === 1) {
         if (appElement) {
           appElement.style.transition = "transform 500ms cubic-bezier(0.32, 0.72, 0, 1), border-radius 500ms cubic-bezier(0.32, 0.72, 0, 1)";
         }
-        updateAppScale(1); // Scale back to 1
+        updateAppScale(1, true); // Scale back to 1
       }
 
       // Wait for animation to complete before cleaning up
       setTimeout(() => {
-        (window as any).__drawerCount--;
+        setDrawerCount(drawerCount.value - 1);
         translateY.value = 0;
         isClosing.value = false;
 
-        if ((window as any).__drawerCount === 0) {
+        if (drawerCount.value === 0) {
           shouldShowBackdrop.value = false;
         }
       }, 500);
     } else if (!newVal && isClosing.value) {
       // Already closing via handleClose, just clean up
-      (window as any).__drawerCount--;
+      setDrawerCount(drawerCount.value - 1);
       translateY.value = 0;
       isClosing.value = false;
 
-      if ((window as any).__drawerCount === 0) {
+      if (drawerCount.value === 0) {
         shouldShowBackdrop.value = false;
       }
     }
