@@ -6,6 +6,9 @@ import OfflineBanner from "./OfflineBanner.vue";
 import DebugConsole from "./DebugConsole.vue";
 import SettingsDrawer from "./drawer/SettingsDrawer.vue";
 import AbsenceDrawer from "./drawer/AbsenceDrawer.vue";
+import WeekInsights from "./widgets/WeekInsights.vue";
+import WeekObjective from "./widgets/WeekObjective.vue";
+import WeekTopDay from "./widgets/WeekTopDay.vue";
 import { useLocalStorage } from "../composables/useLocalStorage";
 import { useAbsences } from "../composables/useAbsences";
 import { useWeekDays } from "../composables/useWeekDays";
@@ -13,6 +16,7 @@ import { useTimeObjective } from "../composables/useTimeObjective";
 import { useDaysLeft } from "../composables/useDaysLeft";
 import { useSuggestions } from "../composables/useSuggestions";
 import { useDrawers } from "../composables/useDrawers";
+import { useStats } from "../composables/useStats";
 import type { ApiResponse, Credentials, LogEntry } from "../types";
 
 const props = defineProps<{
@@ -70,7 +74,20 @@ const dataRef = toRef(() => props.data),
     toggleSettingsDrawer,
     toggleAbsenceDrawer,
     handleMarkAbsent,
-  } = useDrawers();
+  } = useDrawers(),
+  {
+    dailyAverage,
+    mostProductiveDay,
+    workedDays,
+    progressPercentage,
+    statusEmoji,
+  } = useStats(
+    days,
+    missingDates,
+    minutesObjective,
+    toRef(() => props.data.total_effective),
+    toRef(() => props.data.total_paid)
+  );
 
 const showMore = (event: MouseEvent) => {
     const parent = (event.target as HTMLElement).closest(".day-card");
@@ -132,27 +149,60 @@ onMounted(() => {
       @open-settings="toggleSettingsDrawer"
     />
 
-    <!-- Days -->
-    <div class="space-y-6 px-6 pt-47 pb-40">
-      <OfflineBanner :offline="offline" />
+    <!-- Résumé Section -->
+    <div class="pt-47 pb-8">
+      <div class="px-6 mb-4 max-w-md mx-auto">
+        <h2 class="text-sm font-medium text-[var(--text-tertiary)] uppercase tracking-wider">
+          Résumé
+        </h2>
+      </div>
+      <div class="px-6">
+        <div class="grid grid-cols-3 gap-2 max-w-md mx-auto">
+          <WeekInsights
+            :daily-average="dailyAverage"
+            :worked-days="workedDays"
+            :most-productive-day="mostProductiveDay"
+          />
+          <WeekObjective
+            :progress-percentage="progressPercentage"
+            :status-emoji="statusEmoji"
+            :worked-days="workedDays"
+          />
+          <WeekTopDay
+            :most-productive-day="mostProductiveDay"
+          />
+        </div>
+      </div>
+    </div>
 
-      <DayCard
-        v-for="(times, date, index) in days"
-        :key="date"
-        :date="date"
-        :times="times"
-        :index="index"
-        :missing-dates="missingDates"
-        :suggested-time-blocks="suggestedTimeBlocks[date]"
-        :selected-suggested-block="selectedSuggestedBlock"
-        :is-day-card-half-transparent="isDayCardHalfTransparent(times, date)"
-        :is-day-card-transparent="isDayCardTransparent(times, date)"
-        @show-more="showMore"
-        @mark-absent="handleMarkAbsent"
-        @remove-absent="removeAbsent"
-        @update:selected-suggested-block="selectedSuggestedBlock = $event"
-        @start-resize-suggestion="startResizeSuggestion"
-      />
+    <!-- Jours Section -->
+    <div class="pb-40">
+      <div class="px-6 mb-4 max-w-md mx-auto">
+        <h2 class="text-sm font-medium text-[var(--text-tertiary)] uppercase tracking-wider">
+          Jours
+        </h2>
+      </div>
+      <div class="space-y-6">
+        <OfflineBanner :offline="offline" />
+
+        <DayCard
+          v-for="(times, date, index) in days"
+          :key="date"
+          :date="date"
+          :times="times"
+          :index="index"
+          :missing-dates="missingDates"
+          :suggested-time-blocks="suggestedTimeBlocks[date]"
+          :selected-suggested-block="selectedSuggestedBlock"
+          :is-day-card-half-transparent="isDayCardHalfTransparent(times, date)"
+          :is-day-card-transparent="isDayCardTransparent(times, date)"
+          @show-more="showMore"
+          @mark-absent="handleMarkAbsent"
+          @remove-absent="removeAbsent"
+          @update:selected-suggested-block="selectedSuggestedBlock = $event"
+          @start-resize-suggestion="startResizeSuggestion"
+        />
+      </div>
     </div>
 
     <!-- Debug Console -->

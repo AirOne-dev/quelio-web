@@ -70,23 +70,27 @@ onBeforeUnmount(() => {
 <template>
     <div
       :class="[
-        'fixed top-6 left-0 right-0 z-40 pointer-events-none'
+        'fixed top-0 left-0 right-0 z-40 pointer-events-none transition-all duration-500',
+        { '!top-6': state === 'open' }
       ]"
     >
-      <!-- fond gradient blur derrière la barre -->
+      <!-- fond gradient derrière la barre -->
       <div
-        class="absolute top-0 left-0 right-1 h-[calc(100%_+_calc(var(--spacing)_*_12))] backdrop-blur-xl"
-        :style="{ mask: 'linear-gradient(black, black, transparent)' }"
+        class="absolute -top-6 left-0 right-1 h-screen bg-[linear-gradient(to_bottom_right,_var(--bg-from),_var(--bg-to))] pointer-events-none w-full"
+        :style="{ mask: 'linear-gradient(to bottom, black 0px, black 65px, transparent 140px)' }"
       ></div>
 
       <div
         :class="[
-          'px-6 w-full transition-all duration-500',
-          { '!px-12': state === 'open' },
+          'px-0 w-full transition-all duration-500',
+          { '!px-6': state === 'open' },
         ]"
       >
         <div
-          class="px-[24px] py-4 backdrop-blur-xl rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto min-w-[255px] bg-[var(--card-bg)] border border-1 border-[var(--border)]"
+          :class="[
+            'px-[24px] py-4 backdrop-blur-xl rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto min-w-[255px] bg-[var(--card-bg)] border border-1 border-[var(--border)]',
+            { '!bg-transparent !border-transparent !backdrop-blur-none': state === 'closed' }
+          ]"
         >
           <!-- Header avec titre et icônes -->
           <div class="flex justify-between items-center">
