@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
       >
         <div
           :class="[
-            'px-[24px] py-4 backdrop-blur-xl rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto min-w-[255px] bg-[var(--card-bg)] border border-1 border-[var(--border)]',
+            'px-[24px] py-4 backdrop-blur-xl rounded-2xl w-full max-w-md mx-auto overflow-visible relative pointer-events-auto min-w-[255px] bg-[var(--card-bg)] border border-1 border-[var(--border)] transition-all duration-500',
             { '!bg-transparent !border-transparent !backdrop-blur-none': state === 'closed' }
           ]"
         >

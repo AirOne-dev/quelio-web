@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type PropType } from 'vue'
-import type { DayData } from '../../composables/useStats'
+import type { DayData } from '../../types'
 
 defineProps({
   dailyAverage: {

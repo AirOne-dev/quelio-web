@@ -62,3 +62,12 @@ export interface Theme {
     accent: string
   }
 }
+
+export interface DayData {
+  date: string
+  dayName: string
+  totalMinutes: number
+  present: boolean
+  timeBlocks: string[]
+  minutesObjective?: number
+}
