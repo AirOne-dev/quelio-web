@@ -1,10 +1,37 @@
-import type { UserPreferences } from '../types'
+import type { UserPreferences, Credentials, ApiResponse } from '../types'
+import { loadToken } from './storage'
 
 /**
  * Get the session token for the current user
  */
 function getToken(username: string): string | null {
-  return localStorage.getItem(`quelio_token_${username}`)
+  return loadToken(username)
+}
+
+/**
+ * Login user and return API response
+ */
+export async function loginUser(credentials: Credentials): Promise<ApiResponse> {
+  const formData = new FormData()
+  formData.append('username', credentials.username)
+  formData.append('password', credentials.password)
+
+  const response = await fetch('./api/', {
+    method: 'POST',
+    body: formData,
+  })
+
+  if (!response.ok) {
+    throw new Error('Identifiants invalides')
+  }
+
+  const responseData = await response.json()
+
+  if (responseData.error && !responseData.error.includes('using cached data')) {
+    throw new Error(responseData.error)
+  }
+
+  return responseData
 }
 
 /**

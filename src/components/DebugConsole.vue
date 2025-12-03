@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, nextTick } from "vue";
+import { saveToStorage, loadFromStorage } from "../utils/storage";
 import type { LogEntry } from "../types";
 
 const props = defineProps<{
@@ -17,13 +18,12 @@ const position = ref({ x: 20, y: 20 }),
   resizeStart = ref({ x: 0, y: 0, width: 0, height: 0 });
 
 const loadSettings = () => {
-  // Load saved position and size from localStorage
-  const saved = localStorage.getItem(`quelio_debug_console_${props.username}`);
+  // Load saved position and size from storage
+  const saved = loadFromStorage(props.username, 'debug_console');
   if (saved) {
     try {
-      const settings = JSON.parse(saved);
-      position.value = settings.position;
-      size.value = settings.size;
+      position.value = saved.position;
+      size.value = saved.size;
     } catch (e) {
       console.error("Failed to load debug console settings:", e);
     }
@@ -31,15 +31,12 @@ const loadSettings = () => {
 };
 
 const saveSettings = () => {
-    // Save position and size to localStorage
+    // Save position and size to storage
     const settings = {
       position: position.value,
       size: size.value,
     };
-    localStorage.setItem(
-      `quelio_debug_console_${props.username}`,
-      JSON.stringify(settings)
-    );
+    saveToStorage(props.username, 'debug_console', settings);
   },
   handleDragStart = (e: MouseEvent | TouchEvent) => {
     // Drag handlers (supporting both mouse and touch)

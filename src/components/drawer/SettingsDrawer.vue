@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Drawer from "./Drawer.vue";
 import ThemeSelector from "../ThemeSelector.vue";
-import { updateUserPreferences } from "../../composables/useUserPreferences";
+import { updateUserPreferences } from "../../utils/api";
 
 const props = defineProps<{
   minutesObjective: number;

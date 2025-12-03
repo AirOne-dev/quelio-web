@@ -1,5 +1,6 @@
 import { ref } from 'vue'
-import { updateUserPreferences } from './useUserPreferences'
+import { updateUserPreferences } from '../utils/api'
+import { loadUsername, saveToStorage, loadFromStorage } from '../utils/storage'
 
 export type ThemeName = 'midnight' | 'light' | 'abyss' | 'ocean' | 'forest' | 'sunset' | 'lavender'
 
@@ -159,9 +160,9 @@ export function useTheme() {
       }
 
       // Sauvegarder dans l'API et localStorage
-      const username = localStorage.getItem('quelio_username')
+      const username = loadUsername()
       if (username) {
-        localStorage.setItem(`quelio_theme_${username}`, themeName)
+        saveToStorage(username, 'theme', themeName)
 
         // Save to API if requested
         if (saveToApi) {
@@ -174,10 +175,10 @@ export function useTheme() {
   }
 
   const loadTheme = (serverTheme?: string) => {
-    const username = localStorage.getItem('quelio_username')
+    const username = loadUsername()
     if (username) {
       // Priority: server theme > localStorage > default
-      const savedTheme = (serverTheme || localStorage.getItem(`quelio_theme_${username}`)) as ThemeName
+      const savedTheme = (serverTheme || loadFromStorage(username, 'theme')) as ThemeName
       if (savedTheme && themes[savedTheme]) {
         setTheme(savedTheme, false) // Don't save back to API when loading
       } else {
