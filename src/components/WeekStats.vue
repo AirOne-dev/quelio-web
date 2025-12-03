@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 defineProps<{
   totalEffective: string;
@@ -96,7 +96,7 @@ onBeforeUnmount(() => {
                 { '!text-[24px]': state === 'open' },
               ]"
             >
-              <span>Ma semaine {{ drawerCount }}</span>
+              <span>Ma semaine</span>
               <div
                 class="w-6 h-6 p-1 ml-2 cursor-pointer hover:scale-110 active:scale-95 transition-transform"
                 @click="emit('refresh')"

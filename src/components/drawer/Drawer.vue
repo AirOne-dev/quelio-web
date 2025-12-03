@@ -185,7 +185,7 @@ watch(
     <!-- Drawer -->
     <div
       v-if="open || isClosing"
-      class="fixed inset-x-0 bottom-0 z-[9999] flex flex-col transition-transform duration-[400ms] cursor-grab active:cursor-grabbing"
+      class="fixed inset-x-0 bottom-0 z-[9999] flex flex-col transition-transform duration-[400ms] cursor-grab active:cursor-grabbing max-w-xl mx-auto"
       :style="{
         transform: isClosing
           ? 'translateY(100%)'
@@ -206,7 +206,7 @@ watch(
       @mouseleave="handleDragEnd"
     >
       <div
-        class="absolute h-[50px] top-0 w-full"
+        class="absolute h-[50px] top-0 w-full sm:hidden"
         :style="{
           background: 'linear-gradient(to bottom, transparent, var(--card-bg))',
         }"
