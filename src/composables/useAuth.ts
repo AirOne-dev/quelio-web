@@ -17,40 +17,23 @@ export function useAuth() {
   const offline = ref(false)
   const data = ref<ApiResponse | null>(null)
 
-  const saveCredentials = () => {
-    const encodedCredentials = btoa(JSON.stringify(credentials.value))
-    document.cookie = `quelio_credentials=${encodedCredentials}; max-age=2592000; path=/; Secure; SameSite=Strict`
+  const saveSession = () => {
+    // Only save username, never save password
     saveUsername(credentials.value.username)
   }
 
-  const clearCredentials = () => {
-    document.cookie = 'quelio_credentials=; max-age=0; path=/;'
+  const clearSession = () => {
     const username = credentials.value.username
     removeUsername()
     if (username) {
       removeToken(username)
     }
+    credentials.value = { username: '', password: '' }
   }
 
-  const loadCredentials = (): boolean => {
-    const cookies = document.cookie.split(';')
-    const credentialCookie = cookies.find((cookie) =>
-      cookie.trim().startsWith('quelio_credentials=')
-    )
-
-    if (credentialCookie) {
-      try {
-        const encodedCredentials = credentialCookie.split('=')[1]
-        const decodedCredentials = JSON.parse(atob(encodedCredentials))
-        credentials.value = decodedCredentials
-        saveUsername(decodedCredentials.username)
-        return true
-      } catch (err) {
-        console.error('Erreur lors du chargement des credentials:', err)
-        return false
-      }
-    }
-    return false
+  // Clean up old insecure credential cookies (migration)
+  const cleanupOldCredentials = () => {
+    document.cookie = 'quelio_credentials=; max-age=0; path=/;'
   }
 
   const login = async () => {
@@ -67,15 +50,27 @@ export function useAuth() {
       data.value = responseData
       isAuthenticated.value = true
 
-      saveCredentials()
+      // Save session (username only)
+      saveSession()
 
+      // Save token for future requests
       if (responseData.token) {
         saveToken(credentials.value.username, responseData.token)
       }
 
+      // Clear password from memory after successful login
+      credentials.value.password = ''
+
       loadTheme(responseData.preferences?.theme)
     } catch (err) {
-      error.value = 'Erreur de connexion. Vérifiez vos identifiants.'
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+
+      if (errorMessage === 'TOKEN_EXPIRED') {
+        error.value = 'Session expirée. Veuillez vous reconnecter.'
+      } else {
+        error.value = 'Erreur de connexion. Vérifiez vos identifiants.'
+      }
+
       console.error('Erreur:', err)
     } finally {
       loading.value = false
@@ -85,12 +80,27 @@ export function useAuth() {
   const logout = () => {
     isAuthenticated.value = false
     data.value = null
-    clearCredentials()
+    clearSession()
   }
 
   const autoLogin = async () => {
-    if (loadCredentials()) {
-      await login()
+    // Clean up old insecure credentials from previous version
+    cleanupOldCredentials()
+
+    // Try to auto-login with stored token (no password needed)
+    const storedUsername = localStorage.getItem('quelio_username')
+
+    if (storedUsername) {
+      credentials.value.username = storedUsername
+      // Don't set password - loginUser will use token instead
+
+      try {
+        await login()
+      } catch (err) {
+        // Token expired or invalid, show login screen
+        loading.value = false
+        loadTheme()
+      }
     } else {
       loading.value = false
       loadTheme()

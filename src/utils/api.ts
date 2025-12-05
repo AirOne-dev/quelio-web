@@ -10,11 +10,24 @@ function getToken(username: string): string | null {
 
 /**
  * Login user and return API response
+ * Uses token if available, otherwise uses credentials
  */
 export async function loginUser(credentials: Credentials): Promise<ApiResponse> {
   const formData = new FormData()
   formData.append('username', credentials.username)
-  formData.append('password', credentials.password)
+
+  // Try to use token first if available
+  const token = getToken(credentials.username)
+
+  if (token && !credentials.password) {
+    // Use token authentication
+    formData.append('token', token)
+  } else if (credentials.password) {
+    // Use password authentication (first login or token expired)
+    formData.append('password', credentials.password)
+  } else {
+    throw new Error('No authentication method available')
+  }
 
   const response = await fetch('./api/', {
     method: 'POST',
@@ -22,6 +35,10 @@ export async function loginUser(credentials: Credentials): Promise<ApiResponse> 
   })
 
   if (!response.ok) {
+    // If token auth failed with 401, throw a specific error
+    if (response.status === 401 && token && !credentials.password) {
+      throw new Error('TOKEN_EXPIRED')
+    }
     throw new Error('Identifiants invalides')
   }
 
