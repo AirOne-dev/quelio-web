@@ -12,6 +12,7 @@ export function useDrawers() {
   }
 
   return {
+    ANIMATION_DURATION: 500,
     drawerCount,
     setDrawerCount,
   }

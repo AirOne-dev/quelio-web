@@ -2,6 +2,7 @@
 import Drawer from "./Drawer.vue";
 import ThemeSelector from "../ThemeSelector.vue";
 import { updateUserPreferences } from "../../utils/api";
+import { useDrawers } from "../../composables/useDrawers";
 
 const props = defineProps<{
   minutesObjective: number;
@@ -14,19 +15,32 @@ const emit = defineEmits<{
   (e: "update:minutes-objective", value: number): void;
 }>();
 
-const changeHourObjective = async (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const minutes = Number(target.value) * 60;
+const { ANIMATION_DURATION } = useDrawers();
 
-  emit("update:minutes-objective", minutes);
+const updateHourObjective = async (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const minutes = Number(target.value) * 60;
 
-  // Save to API
-  await updateUserPreferences(props.username, { minutes_objective: minutes });
-};
+    emit("update:minutes-objective", minutes);
+
+    // Save to API
+    await updateUserPreferences(props.username, { minutes_objective: minutes });
+  },
+  logout = () => {
+    emit("close");
+    setTimeout(() => {
+      emit("logout");
+    }, ANIMATION_DURATION)
+  },
+  updateDrawerState = (isOpen: boolean) => {
+    if (!isOpen) {
+      emit("close");
+    }
+  };
 </script>
 
 <template>
-  <Drawer :open="show" @update:open="(val) => !val && emit('close')">
+  <Drawer :open="show" @update:open="updateDrawerState">
     <div class="flex flex-col gap-6 pb-2">
       <!-- Header -->
       <div class="flex items-center justify-center relative">
@@ -78,14 +92,14 @@ const changeHourObjective = async (event: Event) => {
               class="w-16 px-3 py-2 rounded-xl text-center font-semibold text-lg transition-all outline-none cursor-pointer bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-primary)]"
               placeholder="38"
               :value="minutesObjective / 60"
-              @input="changeHourObjective"
+              @input="updateHourObjective"
             />
           </label>
         </div>
 
         <!-- Logout Button -->
         <button
-          @click="emit('logout')"
+          @click="logout"
           class="backdrop-blur-xl rounded-2xl p-4 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-all group bg-[var(--card-bg)] border border-[var(--border)] hover:bg-[rgba(239,68,68,0.1)]"
         >
           <div
