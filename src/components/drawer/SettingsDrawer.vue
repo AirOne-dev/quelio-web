@@ -30,7 +30,7 @@ const updateHourObjective = async (event: Event) => {
     emit("close");
     setTimeout(() => {
       emit("logout");
-    }, ANIMATION_DURATION)
+    }, ANIMATION_DURATION-100)
   },
   updateDrawerState = (isOpen: boolean) => {
     if (!isOpen) {
