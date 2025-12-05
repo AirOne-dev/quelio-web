@@ -2,9 +2,11 @@ import { createApp } from 'vue'
 import './styles/main.css'
 import App from './App.vue'
 import moment from 'moment'
-
-// Import et configure la locale française
 import 'moment/dist/locale/fr'
+import { useTheme } from './composables/useTheme'
+
 moment.locale('fr')
 
-createApp(App).mount('#app')
+useTheme().loadTheme().then(() => {
+  createApp(App).mount('#app')
+});

@@ -14,7 +14,6 @@ function getToken(username: string): string | null {
  */
 export async function loginUser(credentials: Credentials): Promise<ApiResponse> {
   const formData = new FormData()
-  formData.append('username', credentials.username)
 
   // Try to use token first if available
   const token = getToken(credentials.username)
@@ -24,10 +23,13 @@ export async function loginUser(credentials: Credentials): Promise<ApiResponse> 
     formData.append('token', token)
   } else if (credentials.password) {
     // Use password authentication (first login or token expired)
+    formData.append('username', credentials.username)
     formData.append('password', credentials.password)
   } else {
     throw new Error('No authentication method available')
   }
+
+  formData.append('action', 'login')
 
   const response = await fetch('./api/', {
     method: 'POST',
@@ -68,7 +70,6 @@ export async function updateUserPreferences(
 
     const formData = new FormData()
     formData.append('action', 'update_preferences')
-    formData.append('username', username)
     formData.append('token', token)
 
     if (preferences.theme !== undefined) {

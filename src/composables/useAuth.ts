@@ -1,111 +1,107 @@
-import { ref } from 'vue'
-import { useTheme } from './useTheme'
-import { loginUser } from '../utils/api'
-import { saveUsername, removeUsername, saveToken, removeToken } from '../utils/storage'
-import type { Credentials, ApiResponse } from '../types'
+import { ref } from "vue";
+import { useTheme } from "./useTheme";
+import { loginUser } from "../utils/api";
+import {
+  saveUsername,
+  saveToken,
+  removeToken,
+  loadUsername,
+  loadToken,
+} from "../utils/storage";
+import type { Credentials, ApiResponse } from "../types";
 
 export function useAuth() {
-  const { loadTheme } = useTheme()
+  const { loadTheme } = useTheme();
 
-  const isAuthenticated = ref(false)
-  const loading = ref(true)
-  const error = ref<string | null>(null)
-  const credentials = ref<Credentials>({
-    username: '',
-    password: '',
-  })
-  const offline = ref(false)
-  const data = ref<ApiResponse | null>(null)
-
-  const saveSession = () => {
-    // Only save username, never save password
-    saveUsername(credentials.value.username)
-  }
+  const isAuthenticated = ref(false),
+    loading = ref(true),
+    error = ref<string | null>(null),
+    credentials = ref<Credentials>({
+      username: "",
+      password: "",
+    }),
+    offline = ref(false),
+    data = ref<ApiResponse | null>(null);
 
   const clearSession = () => {
-    const username = credentials.value.username
-    removeUsername()
-    if (username) {
-      removeToken(username)
-    }
-    credentials.value = { username: '', password: '' }
-  }
+      const username = credentials.value.username;
 
-  // Clean up old insecure credential cookies (migration)
-  const cleanupOldCredentials = () => {
-    document.cookie = 'quelio_credentials=; max-age=0; path=/;'
-  }
-
-  const login = async () => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const responseData = await loginUser(credentials.value)
-
-      if (responseData.error?.includes('using cached data')) {
-        offline.value = true
+      if (username) {
+        removeToken(username);
       }
-
-      data.value = responseData
-      isAuthenticated.value = true
-
-      // Save session (username only)
-      saveSession()
-
-      // Save token for future requests
-      if (responseData.token) {
-        saveToken(credentials.value.username, responseData.token)
-      }
-
-      // Clear password from memory after successful login
-      credentials.value.password = ''
-
-      loadTheme(responseData.preferences?.theme)
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
-
-      if (errorMessage === 'TOKEN_EXPIRED') {
-        error.value = 'Session expirée. Veuillez vous reconnecter.'
-      } else {
-        error.value = 'Erreur de connexion. Vérifiez vos identifiants.'
-      }
-
-      console.error('Erreur:', err)
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const logout = () => {
-    isAuthenticated.value = false
-    data.value = null
-    clearSession()
-  }
-
-  const autoLogin = async () => {
-    // Clean up old insecure credentials from previous version
-    cleanupOldCredentials()
-
-    // Try to auto-login with stored token (no password needed)
-    const storedUsername = localStorage.getItem('quelio_username')
-
-    if (storedUsername) {
-      credentials.value.username = storedUsername
-      // Don't set password - loginUser will use token instead
+      credentials.value.password = "";
+    },
+    cleanupOldCredentials = () => {
+      document.cookie = "quelio_credentials=; max-age=0; path=/;";
+    },
+    login = async () => {
+      loading.value = true;
+      error.value = null;
 
       try {
-        await login()
+        const responseData = await loginUser(credentials.value);
+
+        if (responseData.error?.includes("using cached data")) {
+          offline.value = true;
+        }
+
+        data.value = responseData;
+        isAuthenticated.value = true;
+
+        // Save username
+        saveUsername(credentials.value.username);
+
+        // Save token for future requests
+        if (responseData.token) {
+          saveToken(credentials.value.username, responseData.token);
+        }
+
+        // Clear password from memory after successful login
+        credentials.value.password = "";
+
+        await loadTheme(responseData.preferences?.theme);
       } catch (err) {
-        // Token expired or invalid, show login screen
-        loading.value = false
-        loadTheme()
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
+
+        if (errorMessage === "TOKEN_EXPIRED") {
+          error.value = "Session expirée. Veuillez vous reconnecter.";
+        } else {
+          error.value = "Erreur de connexion. Vérifiez vos identifiants.";
+        }
+
+        console.error("Erreur:", err);
+      } finally {
+        loading.value = false;
       }
-    } else {
-      loading.value = false
-      loadTheme()
-    }
-  }
+    },
+    logout = () => {
+      isAuthenticated.value = false;
+      data.value = null;
+      clearSession();
+    },
+    autoLogin = async () => {
+      // Clean up old insecure credentials from previous version
+      cleanupOldCredentials();
+
+      // Try to auto-login with stored token (no password needed)
+      const username = loadUsername();
+
+      if (username) {
+        const token = loadToken(username);
+        credentials.value.username = username;
+
+        if (token) {
+          try {
+            await login();
+          } catch (err) {
+            clearSession();
+          }
+        }
+      }
+
+      loading.value = false;
+    };
 
   return {
     isAuthenticated,
@@ -117,5 +113,5 @@ export function useAuth() {
     login,
     logout,
     autoLogin,
-  }
+  };
 }

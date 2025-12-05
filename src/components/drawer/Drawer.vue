@@ -16,7 +16,7 @@ const isDragging = ref(false),
   isClosing = ref(false),
   isAnimating = ref(false),
   shouldShowBackdrop = ref(false),
-  { drawerCount, setDrawerCount } = useDrawers();
+  { drawerCount, ANIMATION_DURATION, setDrawerCount } = useDrawers();
 
 const updateAppScale = (progress: number, reset: boolean = false) => {
     // progress: 0 = drawer open (scale 0.95), 1 = drawer closed (scale 1)
@@ -33,7 +33,7 @@ const updateAppScale = (progress: number, reset: boolean = false) => {
           appElement.style.transform = '';
           appElement.style.borderRadius = '';
           appElement.style.overflow = '';
-        }, 500);
+        }, ANIMATION_DURATION);
       }
     }
   };
@@ -48,7 +48,7 @@ const handleClose = () => {
     // We need to check if count will be 0 after this drawer closes
     if (drawerCount.value === 1) {
       if (appElement) {
-        appElement.style.transition = "transform 500ms cubic-bezier(0.32, 0.72, 0, 1), border-radius 500ms cubic-bezier(0.32, 0.72, 0, 1)";
+        appElement.style.transition = `transform ${ANIMATION_DURATION}ms cubic-bezier(0.32, 0.72, 0, 1), border-radius ${ANIMATION_DURATION}ms cubic-bezier(0.32, 0.72, 0, 1)`;
       }
       updateAppScale(1, true); // Scale back to 1
     }
@@ -57,7 +57,7 @@ const handleClose = () => {
     setTimeout(() => {
       emit("update:open", false);
       // Cleanup will be handled by the watcher
-    }, 500); // Match animation duration
+    }, ANIMATION_DURATION); // Match animation duration
   },
   handleDragStart = (e: TouchEvent | MouseEvent) => {
     isDragging.value = true;
@@ -96,7 +96,7 @@ const handleClose = () => {
     // Restore transition
     const appElement = document.getElementById("app");
     if (appElement) {
-      appElement.style.transition = "transform 400ms cubic-bezier(0.32, 0.72, 0, 1), border-radius 400ms cubic-bezier(0.32, 0.72, 0, 1)";
+      appElement.style.transition = `transform ${ANIMATION_DURATION-100}ms cubic-bezier(0.32, 0.72, 0, 1), border-radius ${ANIMATION_DURATION-100}ms cubic-bezier(0.32, 0.72, 0, 1)`;
     }
 
     // If dragged more than 150px, close the drawer
@@ -125,7 +125,7 @@ watch(
       if (drawerCount.value === 1) {
         shouldShowBackdrop.value = true;
         if (appElement) {
-          appElement.style.transition = "transform 400ms cubic-bezier(0.32, 0.72, 0, 1), border-radius 400ms cubic-bezier(0.32, 0.72, 0, 1)";
+          appElement.style.transition = `transform ${ANIMATION_DURATION-100}ms cubic-bezier(0.32, 0.72, 0, 1), border-radius ${ANIMATION_DURATION-100}ms cubic-bezier(0.32, 0.72, 0, 1)`;
         }
         updateAppScale(0); // Scale to 0.95
       }
@@ -140,7 +140,7 @@ watch(
       // Only update scale if this will be the last drawer closing
       if (drawerCount.value === 1) {
         if (appElement) {
-          appElement.style.transition = "transform 500ms cubic-bezier(0.32, 0.72, 0, 1), border-radius 500ms cubic-bezier(0.32, 0.72, 0, 1)";
+          appElement.style.transition = `transform ${ANIMATION_DURATION}ms cubic-bezier(0.32, 0.72, 0, 1), border-radius ${ANIMATION_DURATION}ms cubic-bezier(0.32, 0.72, 0, 1)`;
         }
         updateAppScale(1, true); // Scale back to 1
       }
@@ -154,7 +154,7 @@ watch(
         if (drawerCount.value === 0) {
           shouldShowBackdrop.value = false;
         }
-      }, 500);
+      }, ANIMATION_DURATION);
     } else if (!newVal && isClosing.value) {
       // Already closing via handleClose, just clean up
       setDrawerCount(drawerCount.value - 1);
@@ -185,7 +185,7 @@ watch(
     <!-- Drawer -->
     <div
       v-if="open || isClosing"
-      class="fixed inset-x-0 bottom-0 z-[9999] flex flex-col transition-transform duration-[400ms] cursor-grab active:cursor-grabbing max-w-xl mx-auto"
+      class="fixed inset-x-0 bottom-0 z-[9999] flex flex-col transition-transform cursor-grab active:cursor-grabbing max-w-xl mx-auto"
       :style="{
         transform: isClosing
           ? 'translateY(100%)'
@@ -195,7 +195,7 @@ watch(
         transitionTimingFunction: isClosing
           ? 'cubic-bezier(0.32, 0.72, 0, 1)'
           : 'cubic-bezier(0.32, 0.72, 0, 1)',
-        transitionDuration: isDragging ? '0ms' : isClosing ? '500ms' : '400ms',
+        transitionDuration: isDragging ? '0ms' : isClosing ? `${ANIMATION_DURATION}ms` : `${ANIMATION_DURATION-100}ms`,
       }"
       @mousedown="handleDragStart"
       @touchstart="handleDragStart"

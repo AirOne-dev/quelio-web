@@ -35,13 +35,6 @@ export function loadUsername(): string | null {
 }
 
 /**
- * Remove current username from localStorage
- */
-export function removeUsername(): void {
-  localStorage.removeItem('quelio_username')
-}
-
-/**
  * Save user token to localStorage
  */
 export function saveToken(username: string, token: string): void {
