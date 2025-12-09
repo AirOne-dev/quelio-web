@@ -9,7 +9,8 @@ export type ThemeName =
   | "ocean"
   | "forest"
   | "sunset"
-  | "lavender";
+  | "lavender"
+  | "christmas";
 
 export interface Theme {
   name: ThemeName;
@@ -86,6 +87,15 @@ export const themes: Record<ThemeName, Theme> = {
       accent: "#D8B4FE",
     },
   },
+  christmas: {
+    name: "christmas",
+    label: "Christmas",
+    colors: {
+      primary: "#DC2626",
+      secondary: "#059669",
+      accent: "#F59E0B",
+    },
+  },
 };
 
 // Background colors for each theme (for meta theme-color)
@@ -97,6 +107,7 @@ const themeBackgrounds: Record<ThemeName, string> = {
   forest: "#1a1f1a",
   sunset: "#1f1d1a",
   lavender: "#1d1a24",
+  christmas: "#1a0f0f",
 };
 
 const currentTheme = ref<ThemeName>("midnight");
@@ -111,6 +122,7 @@ const themeModules: Record<ThemeName, () => Promise<{ default: string }>> = {
   forest: () => import("../styles/themes/forest.css?inline"),
   sunset: () => import("../styles/themes/sunset.css?inline"),
   lavender: () => import("../styles/themes/lavender.css?inline"),
+  christmas: () => import("../styles/themes/christmas.css?inline"),
 };
 
 export function useTheme() {

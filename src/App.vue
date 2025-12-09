@@ -3,8 +3,10 @@ import { onMounted, onBeforeUnmount } from "vue";
 import LoginScreen from "./components/LoginScreen.vue";
 import Dashboard from "./components/Dashboard.vue";
 import Loader from "./components/Loader.vue";
+import ChristmasSnow from "./components/ChristmasSnow.vue";
 import { useAuth } from "./composables/useAuth";
 import { useDebugConsole } from "./composables/useDebugConsole";
+import { useTheme } from "./composables/useTheme";
 
 const {
   isAuthenticated,
@@ -19,6 +21,7 @@ const {
 } = useAuth();
 
 const { debugMode, logs, setupDebugMode, cleanup } = useDebugConsole();
+const { currentTheme } = useTheme();
 
 onMounted(() => {
   setupDebugMode();
@@ -31,6 +34,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <!-- Christmas decorations (only when Christmas theme is active) -->
+  <ChristmasSnow v-if="currentTheme === 'christmas'" />
+
   <!-- Loader -->
   <Loader v-if="loading" />
 
