@@ -51,7 +51,7 @@ export interface LogEntry {
   message: string
 }
 
-export type ThemeName = 'midnight' | 'light' | 'abyss' | 'ocean' | 'forest' | 'sunset' | 'lavender'
+export type ThemeName = 'midnight' | 'light' | 'abyss' | 'ocean' | 'forest' | 'sunset' | 'lavender' | 'christmas'
 
 export interface Theme {
   name: ThemeName

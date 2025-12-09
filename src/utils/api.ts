@@ -37,6 +37,21 @@ export async function loginUser(credentials: Credentials): Promise<ApiResponse> 
   })
 
   if (!response.ok) {
+    // Parse error response to check for token invalidation
+    try {
+      const errorData = await response.json()
+
+      // If token was invalidated, throw specific error
+      if (errorData.token_invalidated) {
+        throw new Error('TOKEN_INVALIDATED')
+      }
+    } catch (e) {
+      // If json parsing fails or TOKEN_INVALIDATED is thrown, re-throw
+      if (e instanceof Error && e.message === 'TOKEN_INVALIDATED') {
+        throw e
+      }
+    }
+
     // If token auth failed with 401, throw a specific error
     if (response.status === 401 && token && !credentials.password) {
       throw new Error('TOKEN_EXPIRED')
@@ -86,6 +101,21 @@ export async function updateUserPreferences(
     })
 
     if (!response.ok) {
+      // Parse error response to check for token invalidation
+      try {
+        const errorData = await response.json()
+
+        // If token was invalidated, throw specific error
+        if (errorData.token_invalidated) {
+          throw new Error('TOKEN_INVALIDATED')
+        }
+      } catch (e) {
+        // If json parsing fails or TOKEN_INVALIDATED is thrown, re-throw
+        if (e instanceof Error && e.message === 'TOKEN_INVALIDATED') {
+          throw e
+        }
+      }
+
       if (response.status === 401) {
         console.error('Token expired or invalid. Please login again.')
       } else {
@@ -97,6 +127,10 @@ export async function updateUserPreferences(
     const data = await response.json()
     return data.success === true
   } catch (error) {
+    // Re-throw TOKEN_INVALIDATED to trigger logout
+    if (error instanceof Error && error.message === 'TOKEN_INVALIDATED') {
+      throw error
+    }
     console.error('Error updating preferences:', error)
     return false
   }

@@ -64,7 +64,10 @@ export function useAuth() {
         const errorMessage =
           err instanceof Error ? err.message : "Unknown error";
 
-        if (errorMessage === "TOKEN_EXPIRED") {
+        if (errorMessage === "TOKEN_INVALIDATED") {
+          error.value = "Votre session a été invalidée suite à une erreur. Veuillez vous reconnecter.";
+          clearSession();
+        } else if (errorMessage === "TOKEN_EXPIRED") {
           error.value = "Session expirée. Veuillez vous reconnecter.";
         } else {
           error.value = "Erreur de connexion. Vérifiez vos identifiants.";

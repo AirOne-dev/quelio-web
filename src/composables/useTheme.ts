@@ -110,7 +110,7 @@ const themeBackgrounds: Record<ThemeName, string> = {
   christmas: "#1a0f0f",
 };
 
-const currentTheme = ref<ThemeName>("midnight");
+const currentTheme = ref<ThemeName>("christmas");
 let currentStyleElement: HTMLStyleElement | null = null;
 
 // Map des imports de thèmes
@@ -193,7 +193,16 @@ export function useTheme() {
 
           // Save to API if requested
           if (saveToApi) {
-            await updateUserPreferences(username, { theme: themeName });
+            try {
+              await updateUserPreferences(username, { theme: themeName });
+            } catch (prefError) {
+              // If token was invalidated, log it but don't crash
+              if (prefError instanceof Error && prefError.message === 'TOKEN_INVALIDATED') {
+                console.warn('Token was invalidated, preferences not saved. Please login again.');
+              } else {
+                console.error('Failed to save theme preferences:', prefError);
+              }
+            }
           }
         }
       } catch (error) {
@@ -214,21 +223,21 @@ export function useTheme() {
           if (savedTheme && themes[savedTheme]) {
             await setTheme(savedTheme, false); // Don't save back to API when loading
           } else {
-            await setTheme("midnight", false);
+            await setTheme("christmas", false);
           }
         } else {
           // No username, use provided theme or default
           const themeToLoad =
             serverTheme && themes[serverTheme as ThemeName]
               ? (serverTheme as ThemeName)
-              : "midnight";
+              : "christmas";
           await setTheme(themeToLoad, false);
         }
       } catch (error) {
-        console.error("Error loading theme, falling back to midnight:", error);
-        // Last resort: try to load midnight theme
+        console.error("Error loading theme, falling back to christmas:", error);
+        // Last resort: try to load christmas theme
         try {
-          await setTheme("midnight", false);
+          await setTheme("christmas", false);
         } catch (fallbackError) {
           console.error(
             "Critical: Failed to load fallback theme:",

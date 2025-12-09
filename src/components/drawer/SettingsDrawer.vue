@@ -24,7 +24,16 @@ const updateHourObjective = async (event: Event) => {
     emit("update:minutes-objective", minutes);
 
     // Save to API
-    await updateUserPreferences(props.username, { minutes_objective: minutes });
+    try {
+      await updateUserPreferences(props.username, { minutes_objective: minutes });
+    } catch (error) {
+      // If token was invalidated, log it but don't crash
+      if (error instanceof Error && error.message === 'TOKEN_INVALIDATED') {
+        console.warn('Token was invalidated, preferences not saved. Please login again.');
+      } else {
+        console.error('Failed to save hour objective:', error);
+      }
+    }
   },
   logout = () => {
     emit("close");
