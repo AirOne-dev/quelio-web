@@ -44,7 +44,6 @@ const MAX_SNOW_HEIGHT = 150; // Hauteur max d'accumulation
 
 // Variables pour la détection du scroll
 let lastScrollY = 0;
-let scrollVelocity = 0;
 const shakeIntensity = ref(0);
 
 // Initialize heightmap
@@ -118,9 +117,6 @@ const handleScroll = () => {
   
   const currentScrollY = appElement.scrollTop;
   const deltaY = currentScrollY - lastScrollY;
-  
-  // Calculer la vélocité du scroll (positive si scroll vers le bas)
-  scrollVelocity = deltaY;
   
   // Détecter si on est proche du bas
   const scrollHeight = appElement.scrollHeight;
