@@ -126,7 +126,7 @@ const handleScroll = () => {
   // Si on scroll vers le bas ET qu'on est proche du bas (moins de 100px)
   if (deltaY > 0 && distanceFromBottom < 100) {
     // Intensité proportionnelle à la vitesse de scroll (max 1.5 pour plus de puissance)
-    const intensity = Math.min(deltaY / 30, 1.5);
+    const intensity = Math.min(deltaY / 30, 15);
     shakeIntensity.value = intensity;
     
     // Faire s'envoler des flocons du sol proportionnellement à l'intensité
@@ -145,7 +145,7 @@ const handleScroll = () => {
         y: snow.y,
         radius: snow.radius,
         speed: -1.5 * intensity - Math.random() * 2 * intensity, // Plus rapide si scroll rapide
-        wind: (Math.random() - 0.5) * 3 * intensity, // Plus de mouvement latéral si scroll rapide
+        wind: (Math.random() - 0.5) * intensity, // Plus de mouvement latéral si scroll rapide
         opacity: snow.opacity,
         landed: false,
       };
