@@ -42,6 +42,11 @@ const MAX_STACKED_SNOW = 1000; // Limite avant fusion
 const MAX_FALLING_FLAKES = 150; // Nombre max de flocons qui tombent
 const MAX_SNOW_HEIGHT = 150; // Hauteur max d'accumulation
 
+// Variables pour la détection du scroll
+let lastScrollY = 0;
+let scrollVelocity = 0;
+const shakeIntensity = ref(0);
+
 // Initialize heightmap
 const initHeightMap = () => {
   const gridCount = Math.ceil(canvasWidth.value / GRID_SIZE);
@@ -106,6 +111,76 @@ const mergeStackedSnow = () => {
   }
 };
 
+// Handle scroll shake effect
+const handleScroll = () => {
+  const appElement = document.getElementById('app');
+  if (!appElement) return;
+  
+  const currentScrollY = appElement.scrollTop;
+  const deltaY = currentScrollY - lastScrollY;
+  
+  // Calculer la vélocité du scroll (positive si scroll vers le bas)
+  scrollVelocity = deltaY;
+  
+  // Détecter si on est proche du bas
+  const scrollHeight = appElement.scrollHeight;
+  const clientHeight = appElement.clientHeight;
+  const distanceFromBottom = scrollHeight - (currentScrollY + clientHeight);
+  
+  // Si on scroll vers le bas ET qu'on est proche du bas (moins de 100px)
+  if (deltaY > 0 && distanceFromBottom < 100) {
+    // Intensité proportionnelle à la vitesse de scroll (max 1.5 pour plus de puissance)
+    const intensity = Math.min(deltaY / 30, 1.5);
+    shakeIntensity.value = intensity;
+    
+    // Faire s'envoler des flocons du sol proportionnellement à l'intensité
+    const numFlakesToShake = Math.floor(intensity * 40); // Jusqu'à 60 flocons (40 * 1.5)
+    
+    // Trier par position Y pour prendre ceux du bas
+    const sortedSnow = [...stackedSnow.value].sort((a, b) => b.y - a.y);
+    
+    for (let i = 0; i < Math.min(numFlakesToShake, sortedSnow.length); i++) {
+      const snow = sortedSnow[i];
+      
+      // Transformer le flocon au sol en flocon qui tombe
+      // La vitesse d'envol est directement proportionnelle à l'intensité (vitesse de scroll)
+      const liftedFlake: Snowflake = {
+        x: snow.x,
+        y: snow.y,
+        radius: snow.radius,
+        speed: -1.5 * intensity - Math.random() * 2 * intensity, // Plus rapide si scroll rapide
+        wind: (Math.random() - 0.5) * 3 * intensity, // Plus de mouvement latéral si scroll rapide
+        opacity: snow.opacity,
+        landed: false,
+      };
+      
+      snowflakes.value.push(liftedFlake);
+      
+      // Retirer du sol
+      const originalIndex = stackedSnow.value.findIndex(
+        s => s.x === snow.x && s.y === snow.y
+      );
+      if (originalIndex !== -1) {
+        stackedSnow.value.splice(originalIndex, 1);
+        
+        // Réduire la hauteur dans la heightmap
+        const gridIndex = Math.floor(snow.x / GRID_SIZE);
+        if (gridIndex >= 0 && gridIndex < snowHeightMap.value.length) {
+          snowHeightMap.value[gridIndex] = Math.max(
+            0,
+            snowHeightMap.value[gridIndex] - snow.radius * 0.2
+          );
+        }
+      }
+    }
+  }
+  
+  lastScrollY = currentScrollY;
+  
+  // Décrémenter l'intensité progressivement
+  shakeIntensity.value = Math.max(0, shakeIntensity.value - 0.05);
+};
+
 // Update snowflake positions
 const updateSnowflakes = () => {
   const width = canvasWidth.value;
@@ -122,6 +197,15 @@ const updateSnowflakes = () => {
     // Move snowflake
     flake.y += flake.speed;
     flake.x += flake.wind;
+    
+    // Si le flocon monte (vitesse négative), le ralentir progressivement
+    if (flake.speed < 0) {
+      flake.speed += 0.08; // Gravité
+      // Si le flocon retombe, lui donner une vitesse de chute normale
+      if (flake.speed >= 0) {
+        flake.speed = 0.3 + Math.random() * 1.2;
+      }
+    }
 
     // Wrap around horizontally
     if (flake.x > width) {
@@ -134,7 +218,7 @@ const updateSnowflakes = () => {
     const snowHeight = getSnowHeightAt(flake.x);
     const groundY = height - snowHeight;
 
-    if (flake.y + flake.radius >= groundY) {
+    if (flake.y + flake.radius >= groundY && flake.speed > 0) {
       // Snowflake landed!
       flake.landed = true;
 
@@ -271,6 +355,12 @@ const resizeCanvas = () => {
 onMounted(() => {
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
+  
+  const appElement = document.getElementById('app');
+  if (appElement) {
+    appElement.addEventListener('scroll', handleScroll, { passive: true });
+    lastScrollY = appElement.scrollTop;
+  }
 
   if (snowCanvas.value) {
     const ctx = snowCanvas.value.getContext('2d');
@@ -282,6 +372,12 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', resizeCanvas);
+  
+  const appElement = document.getElementById('app');
+  if (appElement) {
+    appElement.removeEventListener('scroll', handleScroll);
+  }
+  
   if (animationFrameId !== null) {
     cancelAnimationFrame(animationFrameId);
   }
