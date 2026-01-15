@@ -21,7 +21,6 @@ api/composer.lock
 api/vendor/
 api/.phpunit.cache/
 api/coverage/
-api/Makefile
 api/TESTING.md
 
 # Git metadata
