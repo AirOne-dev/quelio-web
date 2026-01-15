@@ -17,9 +17,29 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Copier l'API dans dist
+# Copier l'API dans dist (avec exclusions)
 echo "📋 Copying API to dist..."
-cp -r api dist/api
+
+# Check if .buildignore exists
+if [ -f ".buildignore" ]; then
+    echo "   Using .buildignore for exclusions..."
+
+    # Create rsync exclude-from file from .buildignore
+    # Remove comments and empty lines, convert patterns to rsync format
+    EXCLUDE_FILE=$(mktemp)
+    grep -v '^#' .buildignore | grep -v '^[[:space:]]*$' | sed 's|^api/||' > "$EXCLUDE_FILE"
+
+    # Use rsync with exclusions
+    rsync -a --exclude-from="$EXCLUDE_FILE" api/ dist/api/
+
+    # Clean up temp file
+    rm "$EXCLUDE_FILE"
+
+    echo "   ✓ API copied with exclusions applied"
+else
+    echo "   ⚠️  No .buildignore found, copying all API files..."
+    cp -r api dist/api
+fi
 
 echo ""
 echo "✅ Build completed successfully!"
