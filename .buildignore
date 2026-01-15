@@ -7,15 +7,26 @@ api/README.md
 api/CLAUDE.md
 api/config.example.php
 api/.gitignore
+api/.claude/
 
 # Test files and directories
 api/tests/
 api/tests.sh
 api/test_*.php
 api/analyze_*.php
+api/run-tests.sh
+api/phpunit.xml
+api/composer.json
+api/composer.lock
+api/vendor/
+api/.phpunit.cache/
+api/coverage/
+api/Makefile
+api/TESTING.md
 
 # Git metadata
 api/.git/
+api/.git
 
 # Development data
 api/data.json
