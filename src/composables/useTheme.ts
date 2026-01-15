@@ -110,7 +110,7 @@ const themeBackgrounds: Record<ThemeName, string> = {
   christmas: "#1a0f0f",
 };
 
-const currentTheme = ref<ThemeName>("christmas");
+const currentTheme = ref<ThemeName>("ocean");
 let currentStyleElement: HTMLStyleElement | null = null;
 
 // Map des imports de thèmes
@@ -223,21 +223,21 @@ export function useTheme() {
           if (savedTheme && themes[savedTheme]) {
             await setTheme(savedTheme, false); // Don't save back to API when loading
           } else {
-            await setTheme("christmas", false);
+            await setTheme("ocean", false);
           }
         } else {
           // No username, use provided theme or default
           const themeToLoad =
             serverTheme && themes[serverTheme as ThemeName]
               ? (serverTheme as ThemeName)
-              : "christmas";
+              : "ocean";
           await setTheme(themeToLoad, false);
         }
       } catch (error) {
-        console.error("Error loading theme, falling back to christmas:", error);
-        // Last resort: try to load christmas theme
+        console.error("Error loading theme, falling back to ocean:", error);
+        // Last resort: try to load ocean theme
         try {
-          await setTheme("christmas", false);
+          await setTheme("ocean", false);
         } catch (fallbackError) {
           console.error(
             "Critical: Failed to load fallback theme:",
