@@ -1,0 +1,51 @@
+# Build Ignore File
+# Files and directories listed here will be excluded from the production build
+# Patterns support wildcards: * (any characters), ** (recursive directories)
+
+# Development and documentation files
+api/*.md
+api/config.example.php
+api/.claude/
+
+# Test files and directories
+api/tests/
+api/run-tests.sh
+api/phpunit.xml
+api/composer.json
+api/composer.lock
+api/vendor/
+api/.phpunit.cache/
+api/coverage/
+
+# Git metadata
+api/.github/
+api/.git/
+api/.git
+api/.gitignore
+api/.gitattributes
+
+# Development data
+api/data.json
+
+# Build artifacts
+api/dist/
+
+# Editor and IDE files
+api/.vscode/
+api/.idea/
+api/*.swp
+api/*.swo
+api/*~
+
+# OS-specific files
+api/.DS_Store
+api/Thumbs.db
+
+# Logs
+api/*.log
+api/logs/
+
+# Temporary files
+api/tmp/
+api/temp/
+api/*.tmp
