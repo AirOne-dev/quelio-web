@@ -3,17 +3,12 @@
 # Patterns support wildcards: * (any characters), ** (recursive directories)
 
 # Development and documentation files
-api/README.md
-api/CLAUDE.md
+api/*.md
 api/config.example.php
-api/.gitignore
 api/.claude/
 
 # Test files and directories
 api/tests/
-api/tests.sh
-api/test_*.php
-api/analyze_*.php
 api/run-tests.sh
 api/phpunit.xml
 api/composer.json
@@ -21,11 +16,13 @@ api/composer.lock
 api/vendor/
 api/.phpunit.cache/
 api/coverage/
-api/TESTING.md
 
 # Git metadata
+api/.github/
 api/.git/
 api/.git
+api/.gitignore
+api/.gitattributes
 
 # Development data
 api/data.json
