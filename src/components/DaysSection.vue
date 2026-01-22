@@ -22,6 +22,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "mark-absent", date: string): void;
+  (e: "remove-absent", date: string): void;
   (e: "update:selected-suggested-block", value: any): void;
 }>();
 
@@ -33,7 +34,6 @@ const { days } = useWeekStats(dataRef, missingDatesRef, minutesObjectiveRef);
 const {
   isDayCardTransparent,
   isDayCardHalfTransparent,
-  removeAbsent,
 } = useAbsences(props.saveLocalStorage, props.loadLocalStorage);
 
 const { timeToMinutes, formatDataDate, isPastDateOrWeekend, getDayTotal } = useTimeCalculations();
@@ -108,11 +108,11 @@ const showMore = (event: MouseEvent) => {
         :missing-dates="missingDates"
         :suggested-time-blocks="suggestedTimeBlocks[date]"
         :selected-suggested-block="selectedSuggestedBlock"
-        :is-day-card-half-transparent="isDayCardHalfTransparent(times, date)"
-        :is-day-card-transparent="isDayCardTransparent(times, date)"
+        :is-day-card-half-transparent="isDayCardHalfTransparent(times, date, missingDates)"
+        :is-day-card-transparent="isDayCardTransparent(times, date, missingDates)"
         @show-more="showMore"
         @mark-absent="emit('mark-absent', $event)"
-        @remove-absent="removeAbsent"
+        @remove-absent="emit('remove-absent', $event)"
         @update:selected-suggested-block="emit('update:selected-suggested-block', $event)"
         @start-resize-suggestion="startResizeSuggestion"
       />

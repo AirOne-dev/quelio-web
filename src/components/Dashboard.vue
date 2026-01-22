@@ -36,6 +36,7 @@ const dataRef = toRef(() => props.data);
 const {
   missingDates,
   markAbsent,
+  removeAbsent,
   loadMissingDates,
 } = useAbsences(saveLocalStorage, loadLocalStorage);
 
@@ -133,6 +134,7 @@ onMounted(() => {
       :save-local-storage="saveLocalStorage"
       :load-local-storage="loadLocalStorage"
       @mark-absent="handleMarkAbsent"
+      @remove-absent="removeAbsent"
       @update:selected-suggested-block="selectedSuggestedBlock = $event"
     />
 

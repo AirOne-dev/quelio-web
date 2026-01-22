@@ -12,11 +12,7 @@ export function useAbsences(
       section: "day" | "morning" | "afternoon" = "day"
     ) => {
       let missing = loadLocalStorage("missing_dates") ?? [];
-      missing = missing.filter((_: string) => {
-        const [day, month, year] = date.split("-").map(Number);
-        const dateObj = new Date(year, month - 1, day);
-        return dateObj > new Date();
-      });
+      // Remove old future-only filter - we want to keep all absences
       missing.push(section === "day" ? date : `${date} [-] ${section}`);
       saveLocalStorage("missing_dates", missing);
       missingDates.value = missing;
@@ -30,15 +26,15 @@ export function useAbsences(
     loadMissingDates = () => {
       missingDates.value = loadLocalStorage("missing_dates") ?? [];
     },
-    isDayCardTransparent = (times: string[] | undefined, date: string) => {
+    isDayCardTransparent = (times: string[] | undefined, date: string, missing: string[] = missingDates.value) => {
       const { isPastDateOrWeekend } = useTimeCalculations();
       return (
         (!times && isPastDateOrWeekend(date)) ||
-        missingDates.value.map((md) => md.split(" [-] ")[0]).includes(date)
+        missing.map((md) => md.split(" [-] ")[0]).includes(date)
       );
     },
-    isDayCardHalfTransparent = (_times: string[] | undefined, date: string) => {
-      return missingDates.value
+    isDayCardHalfTransparent = (_times: string[] | undefined, date: string, missing: string[] = missingDates.value) => {
+      return missing
         .filter((md) => md.split(" [-] ").length === 2)
         .map((md) => md.split(" [-] ")[0])
         .includes(date);
