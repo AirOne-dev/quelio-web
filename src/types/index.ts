@@ -14,13 +14,28 @@ export interface UserPreferences {
   minutes_objective?: number
 }
 
-export interface ApiResponse {
-  hours: Record<string, string[]>
+export interface DayDetails {
+  hours: string[]
+  breaks: {
+    morning: string
+    noon: string
+    afternoon: string
+  }
+  effective_to_paid: string[]
+  effective: string
+  paid: string
+}
+
+export interface WeekData {
+  days: Record<string, DayDetails>
   total_effective: string
   total_paid: string
-  last_save?: string
+}
+
+export interface ApiResponse {
   preferences?: UserPreferences
   token?: string
+  weeks: Record<string, WeekData>
   error?: string
 }
 

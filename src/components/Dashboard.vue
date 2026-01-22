@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, toRef, onMounted } from "vue";
+import { ref, toRef, onMounted, computed } from "vue";
 import WeekStats from "./WeekStats.vue";
 import WeekSummary from "./WeekSummary.vue";
 import DaysSection from "./DaysSection.vue";
@@ -7,6 +7,7 @@ import DebugConsole from "./DebugConsole.vue";
 import SettingsDrawer from "./drawer/SettingsDrawer.vue";
 import AbsenceDrawer from "./drawer/AbsenceDrawer.vue";
 import { saveToStorage, loadFromStorage } from "../utils/storage";
+import { getCurrentWeekTotalEffective, getCurrentWeekTotalPaid } from "../utils/weekHelpers";
 import { useAbsences } from "../composables/useAbsences";
 import { useTimeObjective } from "../composables/useTimeObjective";
 import { useSuggestions } from "../composables/useSuggestions";
@@ -52,6 +53,10 @@ const {
   suggestedTimeBlocks,
   getCustomBorneForSuggestions,
 } = useSuggestions(days, toRef(() => null), remainingMinutes, saveLocalStorage, loadLocalStorage);
+
+// Extract current week data
+const totalEffective = computed(() => getCurrentWeekTotalEffective(props.data));
+const totalPaid = computed(() => getCurrentWeekTotalPaid(props.data));
 
 // Drawers state
 const showSettingsDrawer = ref(false);
@@ -102,8 +107,8 @@ onMounted(() => {
   <div class="min-h-screen">
     <!-- Header Stats -->
     <WeekStats
-      :total-effective="data.total_effective"
-      :total-paid="data.total_paid"
+      :total-effective="totalEffective"
+      :total-paid="totalPaid"
       :remaining-minutes="remainingMinutes"
       @refresh="emit('refresh')"
       @open-settings="toggleSettingsDrawer"

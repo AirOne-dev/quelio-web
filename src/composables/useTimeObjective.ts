@@ -1,8 +1,10 @@
 import { ref, computed, type Ref } from "vue";
 import { useTimeCalculations } from "./useTimeCalculations";
+import { getCurrentWeekTotalPaid } from "../utils/weekHelpers";
+import type { ApiResponse } from "../types";
 
 export function useTimeObjective(
-  data: Ref<{ total_paid: string }>,
+  data: Ref<ApiResponse | null>,
   missingDates: Ref<string[]>,
   _daysLeft: Ref<string[] | null>,
   saveLocalStorage: (label: string, data: any) => void,
@@ -15,7 +17,7 @@ export function useTimeObjective(
   const remainingMinutes = computed(() => {
       return (
         minutesObjective.value -
-        timeToMinutes(data.value.total_paid) -
+        timeToMinutes(getCurrentWeekTotalPaid(data.value)) -
         (nbMissingInCurrentWeek.value * minutesObjective.value) / nbDays.value
       );
     }),

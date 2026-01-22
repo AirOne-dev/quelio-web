@@ -70,68 +70,63 @@ export async function loginUser(credentials: Credentials): Promise<ApiResponse> 
 
 /**
  * Update user preferences on the server
+ * Now returns complete user data structure (same as login)
  */
 export async function updateUserPreferences(
   username: string,
   preferences: Partial<UserPreferences>
-): Promise<boolean> {
-  try {
-    const token = getToken(username)
+): Promise<ApiResponse> {
+  const token = getToken(username)
 
-    if (!token) {
-      console.error('No valid token found')
-      return false
-    }
-
-    const formData = new FormData()
-    formData.append('action', 'update_preferences')
-    formData.append('token', token)
-
-    if (preferences.theme !== undefined) {
-      formData.append('theme', preferences.theme)
-    }
-
-    if (preferences.minutes_objective !== undefined) {
-      formData.append('minutes_objective', preferences.minutes_objective.toString())
-    }
-
-    const response = await fetch('./api/', {
-      method: 'POST',
-      body: formData
-    })
-
-    if (!response.ok) {
-      // Parse error response to check for token invalidation
-      try {
-        const errorData = await response.json()
-
-        // If token was invalidated, throw specific error
-        if (errorData.token_invalidated) {
-          throw new Error('TOKEN_INVALIDATED')
-        }
-      } catch (e) {
-        // If json parsing fails or TOKEN_INVALIDATED is thrown, re-throw
-        if (e instanceof Error && e.message === 'TOKEN_INVALIDATED') {
-          throw e
-        }
-      }
-
-      if (response.status === 401) {
-        console.error('Token expired or invalid. Please login again.')
-      } else {
-        console.error('Failed to update preferences:', response.statusText)
-      }
-      return false
-    }
-
-    const data = await response.json()
-    return data.success === true
-  } catch (error) {
-    // Re-throw TOKEN_INVALIDATED to trigger logout
-    if (error instanceof Error && error.message === 'TOKEN_INVALIDATED') {
-      throw error
-    }
-    console.error('Error updating preferences:', error)
-    return false
+  if (!token) {
+    throw new Error('No valid token found')
   }
+
+  const formData = new FormData()
+  formData.append('action', 'update_preferences')
+  formData.append('token', token)
+
+  if (preferences.theme !== undefined) {
+    formData.append('theme', preferences.theme)
+  }
+
+  if (preferences.minutes_objective !== undefined) {
+    formData.append('minutes_objective', preferences.minutes_objective.toString())
+  }
+
+  const response = await fetch('./api/', {
+    method: 'POST',
+    body: formData
+  })
+
+  if (!response.ok) {
+    // Parse error response to check for token invalidation
+    try {
+      const errorData = await response.json()
+
+      // If token was invalidated, throw specific error
+      if (errorData.token_invalidated) {
+        throw new Error('TOKEN_INVALIDATED')
+      }
+    } catch (e) {
+      // If json parsing fails or TOKEN_INVALIDATED is thrown, re-throw
+      if (e instanceof Error && e.message === 'TOKEN_INVALIDATED') {
+        throw e
+      }
+    }
+
+    if (response.status === 401) {
+      throw new Error('Token expired or invalid')
+    }
+
+    throw new Error('Failed to update preferences')
+  }
+
+  const data = await response.json()
+
+  if (data.error) {
+    throw new Error(data.error)
+  }
+
+  return data
 }

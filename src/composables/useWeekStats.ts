@@ -1,5 +1,6 @@
 import { computed, type Ref } from "vue";
 import { useTimeCalculations } from "./useTimeCalculations";
+import { getCurrentWeekHours, getCurrentWeekTotalEffective, getCurrentWeekTotalPaid } from "../utils/weekHelpers";
 import type { ApiResponse, DayData } from "../types";
 
 export function useWeekStats(
@@ -20,8 +21,9 @@ export function useWeekStats(
       );
 
       if (data.value) {
+        const currentWeekHours = getCurrentWeekHours(data.value);
         for (const date of getCurrentWeekDates()) {
-          daysObj[date] = data.value.hours[date];
+          daysObj[date] = currentWeekHours[date];
           const [day, month, year] = date.split("-").map(Number);
           const dateObj = new Date(year, month - 1, day);
           if (
@@ -29,7 +31,7 @@ export function useWeekStats(
             !missingDates.value
               .map((md) => md.split(" [-] ")[0])
               .includes(date) &&
-            !data.value.hours[date]
+            !currentWeekHours[date]
           ) {
             missingDates.value.push(date);
           }
@@ -75,7 +77,7 @@ export function useWeekStats(
       });
 
       if (pastDays.length === 0) {
-        return convertTimeToMinutes(data.value.total_effective);
+        return convertTimeToMinutes(getCurrentWeekTotalEffective(data.value));
       }
 
       const pastDaysTotal = pastDays.reduce(
@@ -97,7 +99,7 @@ export function useWeekStats(
       // Progression vers l'objectif (basé sur total_paid)
       const objective = minutesObjective.value || 2100;
       if (objective === 0) return 0;
-      const totalPaidMinutes = convertTimeToMinutes(data.value.total_paid);
+      const totalPaidMinutes = convertTimeToMinutes(getCurrentWeekTotalPaid(data.value));
       return Math.min(100, Math.round((totalPaidMinutes / objective) * 100));
     }),
     statusEmoji = computed(() => {
