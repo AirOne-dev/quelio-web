@@ -1,15 +1,42 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import WeekPicker from "./WeekPicker.vue";
 
-defineProps<{
+const props = defineProps<{
   totalEffective: string;
   totalPaid: string;
   remainingMinutes: number;
+  selectedYear: number;
+  selectedWeek: number;
+  isCurrentWeekSelected: boolean;
+  isLoadingWeek: boolean;
 }>();
+
 const emit = defineEmits<{
   (e: "refresh"): void;
   (e: "openSettings"): void;
+  (e: "select-week", year: number, week: number): void;
+  (e: "go-to-current"): void;
 }>();
+
+const showWeekPicker = ref(false);
+const weekTitleButton = ref<HTMLElement | null>(null);
+const buttonRect = ref<DOMRect | null>(null);
+
+const toggleWeekPicker = () => {
+  if (!showWeekPicker.value && weekTitleButton.value) {
+    // Capture button position before opening
+    buttonRect.value = weekTitleButton.value.getBoundingClientRect();
+  }
+  showWeekPicker.value = !showWeekPicker.value;
+};
+
+const weekTitle = computed(() => {
+  if (props.isCurrentWeekSelected) {
+    return "Ma semaine";
+  }
+  return `Semaine ${props.selectedWeek}`;
+});
 
 const lastScrollTop = ref(0),
   lastDirectionChangeScrollTop = ref(0),
@@ -68,6 +95,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <div>
     <div
       :class="[
         'fixed top-0 left-0 right-0 z-40 pointer-events-none transition-all duration-500',
@@ -95,15 +123,30 @@ onBeforeUnmount(() => {
           <!-- Header avec titre et icônes -->
           <div class="flex justify-between items-center">
             <h1
+              ref="weekTitleButton"
               :class="[
-                'font-bold tracking-tight flex items-center text-[var(--text-primary)] heading-[1.2] text-[18px] transition-all duration-500',
+                'font-bold tracking-tight flex items-center text-[var(--text-primary)] heading-[1.2] text-[18px] transition-all duration-500 cursor-pointer select-none',
                 { '!text-[24px]': state === 'open' },
               ]"
+              @click="toggleWeekPicker"
             >
-              <span>Ma semaine</span>
+              <span>{{ weekTitle }}</span>
+              <svg
+                class="w-4 h-4 ml-1.5 transition-transform"
+                :class="{ 'rotate-180': showWeekPicker }"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
               <div
                 class="w-6 h-6 p-1 ml-2 cursor-pointer hover:scale-110 active:scale-95 transition-transform"
-                @click="emit('refresh')"
+                @click.stop="emit('refresh')"
               >
                 <svg
                   title="Actualiser vos horaires"
@@ -226,4 +269,17 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
+
+    <!-- Week Picker -->
+    <WeekPicker
+      :show="showWeekPicker"
+      :selected-year="selectedYear"
+      :selected-week="selectedWeek"
+      :is-current-week-selected="isCurrentWeekSelected"
+      :origin-rect="buttonRect"
+      @close="showWeekPicker = false"
+      @select-week="(year, week) => emit('select-week', year, week)"
+      @go-to-current="emit('go-to-current')"
+    />
+  </div>
 </template>

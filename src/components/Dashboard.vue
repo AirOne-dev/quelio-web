@@ -6,7 +6,6 @@ import DaysSection from "./DaysSection.vue";
 import DebugConsole from "./DebugConsole.vue";
 import SettingsDrawer from "./drawer/SettingsDrawer.vue";
 import AbsenceDrawer from "./drawer/AbsenceDrawer.vue";
-import WeekSelector from "./WeekSelector.vue";
 import { saveToStorage, loadFromStorage } from "../utils/storage";
 import { getCurrentWeekTotalEffective, getCurrentWeekTotalPaid } from "../utils/weekHelpers";
 import { useAbsences } from "../composables/useAbsences";
@@ -136,21 +135,17 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen">
-    <!-- Header Stats -->
+    <!-- Header Stats with Week Picker -->
     <WeekStats
       :total-effective="totalEffective"
       :total-paid="totalPaid"
       :remaining-minutes="remainingMinutes"
-      @refresh="emit('refresh')"
-      @open-settings="toggleSettingsDrawer"
-    />
-
-    <!-- Week Selector -->
-    <WeekSelector
       :selected-year="selectedYear"
       :selected-week="selectedWeek"
       :is-current-week-selected="isCurrentWeekSelected"
       :is-loading-week="isLoadingWeek"
+      @refresh="emit('refresh')"
+      @open-settings="toggleSettingsDrawer"
       @select-week="selectWeek"
       @go-to-current="goToCurrentWeek"
     />
