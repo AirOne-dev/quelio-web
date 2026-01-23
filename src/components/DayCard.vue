@@ -35,7 +35,7 @@ const formatDate = (date: string) => {
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   },
   handleShowMore = (event: MouseEvent) => {
-    if (props.times) {
+    if (props.times && props.times.length > 0) {
       emit("show-more", event);
     }
   },
@@ -83,7 +83,7 @@ const formatDate = (date: string) => {
           : 'var(--card-bg)',
       }"
     >
-      <div @click="handleShowMore" class="p-6 cursor-pointer">
+      <div @click="handleShowMore" class="p-6" :class="{ 'cursor-pointer': times && times.length > 0 }">
         <!-- Date Header -->
         <div
           class="flex justify-between"
@@ -126,11 +126,11 @@ const formatDate = (date: string) => {
                 {{ formatDate(date) }}
               </h2>
             </div>
-            <div v-if="times" class="text-sm mt-1 text-[var(--accent)]">
+            <div v-if="times && times.length > 0" class="text-sm mt-1 text-[var(--accent)]">
               {{ getDayTotal(times) }}
             </div>
           </div>
-          <div v-if="times" class="w-6 h-6 p-1">
+          <div v-if="times && times.length > 0" class="w-6 h-6 p-1">
             <!-- Caret down icon -->
             <svg
               title="Afficher plus d'informations"
@@ -149,7 +149,7 @@ const formatDate = (date: string) => {
         <!-- Timeline -->
         <div v-if="isDayCardHalfTransparent || !isDayCardTransparent" class="relative">
           <div class="timeline-container relative h-4 rounded-lg bg-[var(--border)]">
-            <template v-if="times">
+            <template v-if="times && times.length > 0">
               <div
                 v-for="(block, idx) in getTimeBlocks(times)"
                 :key="idx"
@@ -213,7 +213,7 @@ const formatDate = (date: string) => {
           class="time-blocks overflow-y-hidden transition-[height] duration-300 ease-in-out"
           style="height: 0px"
         >
-          <div v-if="times" class="space-y-1 pt-8">
+          <div v-if="times && times.length > 0" class="space-y-1 pt-8">
             <div
               v-for="(block, idx) in getTimeBlocks(times)"
               :key="idx"
