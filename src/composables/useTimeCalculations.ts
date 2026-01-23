@@ -46,7 +46,10 @@ export const useTimeCalculations = () => {
       }
       return blocks;
     },
-    getDayTotal = (times: string[]): string => {
+    getDayTotal = (times: string[] | undefined): string => {
+      if (!times || times.length === 0) {
+        return "00:00";
+      }
       let total = 0;
       for (let i = 0; i < times.length; i += 2) {
         const duration =

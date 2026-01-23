@@ -20,23 +20,25 @@ export function useWeekStats(
         today.getDate()
       );
 
-      if (data.value) {
-        const currentWeekHours = getCurrentWeekHours(data.value);
-        for (const date of getCurrentWeekDates()) {
-          daysObj[date] = currentWeekHours[date];
-          const [day, month, year] = date.split("-").map(Number);
-          const dateObj = new Date(year, month - 1, day);
-          if (
-            dateObj < todayObj &&
-            !missingDates.value
-              .map((md) => md.split(" [-] ")[0])
-              .includes(date) &&
-            !currentWeekHours[date]
-          ) {
-            missingDates.value.push(date);
-          }
+      const currentWeekHours = data.value ? getCurrentWeekHours(data.value) : {};
+
+      // Always populate all days of the week, even if no data yet
+      for (const date of getCurrentWeekDates()) {
+        // Ensure we always have an array (empty if no data)
+        daysObj[date] = currentWeekHours[date] || [];
+        const [day, month, year] = date.split("-").map(Number);
+        const dateObj = new Date(year, month - 1, day);
+        if (
+          dateObj < todayObj &&
+          !missingDates.value
+            .map((md) => md.split(" [-] ")[0])
+            .includes(date) &&
+          !currentWeekHours[date]
+        ) {
+          missingDates.value.push(date);
         }
       }
+
       return daysObj;
     }),
     daysData = computed<DayData[]>(() => {
