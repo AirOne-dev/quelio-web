@@ -59,5 +59,6 @@ onBeforeUnmount(() => {
     :logs="logs"
     @logout="logout"
     @refresh="autoLogin"
+    @update:data="data = $event"
   />
 </template>
