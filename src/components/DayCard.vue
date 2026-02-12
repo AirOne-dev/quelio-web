@@ -73,15 +73,13 @@ const formatDate = (date: string) => {
 <template>
   <div class="px-6">
     <div
-      class="day-card rounded-2xl overflow-hidden w-full max-w-md mx-auto relative border border-[var(--border)]"
-      :class="[isDayCardHalfTransparent ? '' : 'backdrop-blur-xl']"
-      :style="{
-        animationDelay: index * 0.1 + 's',
-        opacity: !isDayCardHalfTransparent && isDayCardTransparent ? '0.3 !important' : 1,
-        background: isDayCardHalfTransparent
-          ? 'linear-gradient(to bottom right, var(--card-bg) 50%, rgba(0,0,0,0.2) 50%)'
-          : 'var(--card-bg)',
+      class="day-card rounded-2xl overflow-hidden w-full max-w-md mx-auto relative border border-[var(--border)] backdrop-blur-xl"
+      :class="{
+        'bg-[var(--card-bg)]': !isDayCardHalfTransparent,
+        'day-card--half-transparent !bg-[linear-gradient(to_bottom_right,var(--card-bg)_50%,rgba(0,0,0,0)_50%)] !border-r-0 !border-b-0': isDayCardHalfTransparent,
+        'opacity-30': isDayCardTransparent && !isDayCardHalfTransparent,
       }"
+      :style="{ animationDelay: index * 0.1 + 's' }"
     >
       <div @click="handleShowMore" class="p-6" :class="{ 'cursor-pointer': times && times.length > 0 }">
         <!-- Date Header -->
@@ -238,3 +236,18 @@ const formatDate = (date: string) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+  .day-card--half-transparent::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: .3;
+    background: linear-gradient(to bottom right, transparent 50%, var(--card-bg) 50%);
+    border: solid 1px var(--border);
+    border-radius: 1rem;
+    border-top: none;
+    border-left: none;
+    pointer-events: none;
+  }
+</style>
