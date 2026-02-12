@@ -26,7 +26,7 @@ const {
 </script>
 
 <template>
-  <div class="pb-8">
+  <div class="pt-47 pb-8">
     <div class="px-6 mb-4 max-w-md mx-auto">
       <h2 class="text-sm font-medium text-[var(--text-tertiary)] uppercase tracking-wider">
         Résumé
