@@ -69,6 +69,60 @@ export async function loginUser(credentials: Credentials): Promise<ApiResponse> 
 }
 
 /**
+ * Get data for a specific week
+ */
+export async function getWeek(
+  year: number,
+  week: number,
+  credentials: Credentials
+): Promise<ApiResponse> {
+  const token = getToken(credentials.username)
+
+  if (!token) {
+    throw new Error('No valid token found')
+  }
+
+  const formData = new FormData()
+  formData.append('action', 'getWeek')
+  formData.append('token', token)
+  formData.append('year', year.toString())
+  formData.append('week', week.toString())
+
+  const response = await fetch('./api/', {
+    method: 'POST',
+    body: formData
+  })
+
+  if (!response.ok) {
+    try {
+      const errorData = await response.json()
+
+      if (errorData.token_invalidated) {
+        throw new Error('TOKEN_INVALIDATED')
+      }
+    } catch (e) {
+      if (e instanceof Error && e.message === 'TOKEN_INVALIDATED') {
+        throw e
+      }
+    }
+
+    if (response.status === 401) {
+      throw new Error('Token expired or invalid')
+    }
+
+    throw new Error('Failed to get week data')
+  }
+
+  const data = await response.json()
+
+  if (data.error) {
+    throw new Error(data.error)
+  }
+
+  return data
+}
+
+/**
  * Update user preferences on the server
  * Now returns complete user data structure (same as login)
  */

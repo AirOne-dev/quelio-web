@@ -12,6 +12,7 @@ import { useAbsences } from "../composables/useAbsences";
 import { useTimeObjective } from "../composables/useTimeObjective";
 import { useSuggestions } from "../composables/useSuggestions";
 import { useWeekStats } from "../composables/useWeekStats";
+import { useWeekSelection } from "../composables/useWeekSelection";
 import type { ApiResponse, Credentials, LogEntry } from "../types";
 
 const props = defineProps<{
@@ -25,14 +26,42 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "logout"): void;
   (e: "refresh"): void;
+  (e: "update:data", data: ApiResponse): void;
 }>();
 
 // Storage helpers
 const saveLocalStorage = (label: string, data: any) => saveToStorage(props.credentials.username, label, data);
 const loadLocalStorage = (label: string) => loadFromStorage(props.credentials.username, label);
 
-// Composables
+// Data refs
 const dataRef = toRef(() => props.data);
+const credentialsRef = toRef(() => props.credentials);
+
+// Week selection composable
+const {
+  selectedYear,
+  selectedWeek,
+  selectedWeekKey,
+  isCurrentWeekSelected,
+  isLoadingWeek,
+  selectWeek,
+  goToCurrentWeek,
+} = useWeekSelection(dataRef, credentialsRef, (newData) => {
+  emit("update:data", newData);
+});
+
+// Create filtered data with only the selected week
+const filteredData = computed<ApiResponse>(() => {
+  const weekData = props.data.weeks?.[selectedWeekKey.value];
+
+  return {
+    ...props.data,
+    weeks: weekData ? { [selectedWeekKey.value]: weekData } : {}
+  };
+});
+
+// Composables (use filtered data)
+const filteredDataRef = toRef(() => filteredData.value);
 const {
   missingDates,
   markAbsent,
@@ -45,9 +74,9 @@ const {
   remainingMinutes,
   changeHourObjective,
   loadObjective,
-} = useTimeObjective(dataRef, missingDates, toRef(() => null), saveLocalStorage, loadLocalStorage);
+} = useTimeObjective(filteredDataRef, missingDates, toRef(() => null), saveLocalStorage, loadLocalStorage);
 
-const { days } = useWeekStats(dataRef, missingDates, minutesObjective);
+const { days } = useWeekStats(filteredDataRef, missingDates, minutesObjective);
 
 const {
   selectedSuggestedBlock,
@@ -55,9 +84,9 @@ const {
   getCustomBorneForSuggestions,
 } = useSuggestions(days, toRef(() => null), remainingMinutes, saveLocalStorage, loadLocalStorage);
 
-// Extract current week data
-const totalEffective = computed(() => getCurrentWeekTotalEffective(props.data));
-const totalPaid = computed(() => getCurrentWeekTotalPaid(props.data));
+// Extract selected week data
+const totalEffective = computed(() => getCurrentWeekTotalEffective(filteredData.value));
+const totalPaid = computed(() => getCurrentWeekTotalPaid(filteredData.value));
 
 // Drawers state
 const showSettingsDrawer = ref(false);
@@ -106,25 +135,31 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen">
-    <!-- Header Stats -->
+    <!-- Header Stats with Week Picker -->
     <WeekStats
       :total-effective="totalEffective"
       :total-paid="totalPaid"
       :remaining-minutes="remainingMinutes"
+      :selected-year="selectedYear"
+      :selected-week="selectedWeek"
+      :is-current-week-selected="isCurrentWeekSelected"
+      :is-loading-week="isLoadingWeek"
       @refresh="emit('refresh')"
       @open-settings="toggleSettingsDrawer"
+      @select-week="selectWeek"
+      @go-to-current="goToCurrentWeek"
     />
 
     <!-- Résumé Section -->
     <WeekSummary
-      :data="data"
+      :data="filteredData"
       :missing-dates="missingDates"
       :minutes-objective="minutesObjective"
     />
 
     <!-- Jours Section -->
     <DaysSection
-      :data="data"
+      :data="filteredData"
       :offline="offline"
       :missing-dates="missingDates"
       :minutes-objective="minutesObjective"
